@@ -1,0 +1,355 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+export async function getStaticPaths() {
+  const projects = (
+    await getCollection('projects', ({ data }) => !data.draft)
+  ).sort((a, b) => a.data.order - b.data.order);
+
+  return projects.map((project, i) => ({
+    params: { slug: project.id },
+    props: {
+      project,
+      next: projects[(i + 1) % projects.length],
+    },
+  }));
+}
+
+const { project, next } = Astro.props;
+const { data } = project;
+const { Content } = await render(project);
+
+const linkLabels: Record<string, string> = {
+  live: 'Live site',
+  repo: 'Source',
+  writeup: 'Write-up',
+};
+const linkEntries = Object.entries(data.links).filter(([, v]) => v);
+
+const VIS: Record<string, { label: string; cls: string }> = {
+  public: { label: 'Public', cls: 'pub' },
+  'private-production': { label: 'Private production system', cls: 'prod' },
+  concept: { label: 'Personal / concept', cls: 'concept' },
+};
+const vis = VIS[data.visibility];
+---
+
+<BaseLayout
+  title={`${data.title} — Erick Ti`}
+  description={data.tagline}
+  image={data.ogImage}
+>
+  <article>
+    {/* ---- back ---- */}
+    <div class="wrap">
+      <a href="/projects" class="back mono">← All work</a>
+    </div>
+
+    {/* ---- header ---- */}
+    <header class="wrap head">
+      <div class="head-top" data-reveal>
+        <span class="cat mono">{data.category}</span>
+        <span class="status" data-status={data.status}>
+          <span class="dot"></span>{data.status}
+        </span>
+        <span class:list={['vis-badge', `vis-badge--${vis.cls}`]}>
+          {vis.label}
+        </span>
+      </div>
+      <h1 class="display ptitle" data-reveal>{data.title}</h1>
+      <p class="tagline" data-reveal>{data.tagline}</p>
+    </header>
+
+    {/* ---- cover hero ---- */}
+    {
+      data.coverImage && (
+        <div class="wrap">
+          <figure class="hero-media" data-reveal>
+            <img src={data.coverImage} alt={data.coverAlt ?? data.title} />
+          </figure>
+        </div>
+      )
+    }
+
+    {/* ---- meta panel ---- */}
+    <div class="wrap">
+      <dl class="meta" data-reveal>
+        <div class="meta-item">
+          <dt>Timeframe</dt>
+          <dd>{data.timeframe}</dd>
+        </div>
+        <div class="meta-item">
+          <dt>Role</dt>
+          <dd>{data.role}</dd>
+        </div>
+        <div class="meta-item meta-stack">
+          <dt>Stack</dt>
+          <dd>
+            <ul class="stack">
+              {data.stack.map((t) => <li class="tag">{t}</li>)}
+            </ul>
+          </dd>
+        </div>
+        <div class="meta-item">
+          <dt>Links</dt>
+          <dd>
+            {
+              linkEntries.length > 0 ? (
+                <ul class="links">
+                  {linkEntries.map(([k, v]) => (
+                    <li>
+                      <a
+                        href={v}
+                        class="tlink"
+                        target="_blank"
+                        rel="noopener"
+                      >
+                        {linkLabels[k] ?? k} ↗
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <span class="no-link mono">Internal — case study only</span>
+              )
+            }
+          </dd>
+        </div>
+      </dl>
+    </div>
+
+    {/* ---- metrics ---- */}
+    {
+      data.metrics.length > 0 && (
+        <div class="wrap">
+          <ul class="metrics" data-reveal>
+            {data.metrics.map((m) => (
+              <li>
+                <span class="m-value mono">{m.value}</span>
+                <span class="m-label">{m.label}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )
+    }
+
+    {/* ---- body ---- */}
+    <div class="wrap body" data-reveal>
+      <div class="prose">
+        <Content />
+      </div>
+    </div>
+
+    {/* ---- screenshots ---- */}
+    {
+      data.screenshots.length > 0 && (
+        <div class="wrap shots">
+          <p class="kicker" data-reveal>// screens</p>
+          <div class="shot-grid">
+            {data.screenshots.map((s) => (
+              <figure class="shot" data-reveal>
+                <img src={s.src} alt={s.alt} loading="lazy" />
+                {s.caption && <figcaption>{s.caption}</figcaption>}
+              </figure>
+            ))}
+          </div>
+        </div>
+      )
+    }
+
+    {/* ---- next ---- */}
+    <div class="wrap">
+      <a href={`/projects/${next.id}`} class="next" data-reveal>
+        <span class="next-key mono">Next project →</span>
+        <span class="next-title">{next.data.title}</span>
+        <span class="next-cat mono">{next.data.category}</span>
+      </a>
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .back {
+    display: inline-block;
+    margin-top: 2.5rem;
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    transition: color 0.2s var(--ease);
+  }
+  .back:hover { color: var(--accent); }
+
+  .head { padding-block: 2rem 2.5rem; }
+  .head-top {
+    display: flex;
+    gap: 0.9rem;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .cat {
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  /* visibility badge */
+  .vis-badge {
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.32rem 0.62rem;
+    border: 1px solid var(--border);
+    color: var(--text-faint);
+  }
+  .vis-badge--prod {
+    color: var(--accent);
+    border-color: var(--accent-line);
+    background: var(--accent-soft);
+  }
+  .vis-badge--concept { color: var(--text-dim); }
+
+  /* cover hero */
+  .hero-media {
+    margin-top: 0.75rem;
+    border: 1px solid var(--border);
+    background: var(--bg-elevated);
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+  }
+  .hero-media img { width: 100%; height: 100%; object-fit: cover; }
+
+  /* screenshots */
+  .shots { padding-bottom: 3.5rem; }
+  .shots .kicker { display: block; margin-bottom: 1.3rem; }
+  .shot-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+  .shot {
+    border: 1px solid var(--border);
+    background: var(--bg-elevated);
+  }
+  .shot img { width: 100%; display: block; }
+  .shot figcaption {
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    color: var(--text-dim);
+    padding: 0.7rem 0.9rem;
+    border-top: 1px solid var(--border);
+  }
+  @media (max-width: 640px) {
+    .shot-grid { grid-template-columns: 1fr; }
+  }
+  .ptitle {
+    margin-top: 1.4rem;
+    font-size: clamp(2.6rem, 7vw, 5.5rem);
+  }
+  .tagline {
+    font-family: var(--font-mono);
+    font-size: clamp(0.95rem, 1.6vw, 1.15rem);
+    line-height: 1.6;
+    color: var(--text-dim);
+    max-width: 56ch;
+    margin-top: 1.5rem;
+  }
+
+  /* ---- meta ---- */
+  .meta {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    border: 1px solid var(--border);
+    background: var(--bg-elevated);
+  }
+  .meta-item {
+    padding: 1.1rem 1.25rem;
+    border-right: 1px solid var(--border);
+  }
+  .meta-item:last-child { border-right: 0; }
+  .meta-stack { grid-column: span 1; }
+  .meta dt {
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    margin-bottom: 0.55rem;
+  }
+  .meta dd {
+    font-family: var(--font-mono);
+    font-size: 0.84rem;
+    color: var(--text);
+  }
+  .stack { display: flex; flex-wrap: wrap; gap: 0.35rem; list-style: none; }
+  .links { list-style: none; display: flex; flex-direction: column; gap: 0.4rem; }
+  .no-link { font-size: 0.78rem; color: var(--text-faint); }
+
+  /* ---- metrics ---- */
+  .metrics {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2.5rem;
+    list-style: none;
+    margin-top: 2rem;
+    padding: 1.8rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .metrics li { display: flex; flex-direction: column; gap: 0.3rem; }
+  .m-value {
+    font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+    color: var(--accent);
+    letter-spacing: -0.02em;
+  }
+  .m-label {
+    font-size: 0.74rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-dim);
+  }
+
+  /* ---- body ---- */
+  .body { padding-block: 3rem 4rem; }
+
+  /* ---- next ---- */
+  .next {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    border: 1px solid var(--border);
+    background: var(--bg-elevated);
+    padding: 1.8rem;
+    margin-bottom: 2rem;
+    transition: border-color 0.25s var(--ease), background 0.25s var(--ease);
+  }
+  .next:hover { border-color: var(--accent); background: var(--bg-panel); }
+  .next-key { font-size: 0.74rem; color: var(--text-faint); }
+  .next-title {
+    font-family: var(--font-serif);
+    font-size: clamp(1.6rem, 3vw, 2.4rem);
+    transition: color 0.2s var(--ease);
+  }
+  .next:hover .next-title { color: var(--accent); }
+  .next-cat {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-dim);
+  }
+
+  @media (max-width: 760px) {
+    .meta { grid-template-columns: 1fr 1fr; }
+    .meta-item:nth-child(2) { border-right: 0; }
+    .meta-item:nth-child(1), .meta-item:nth-child(2) {
+      border-bottom: 1px solid var(--border);
+    }
+    .metrics { gap: 1.5rem 2rem; }
+  }
+  @media (max-width: 460px) {
+    .meta { grid-template-columns: 1fr; }
+    .meta-item { border-right: 0; border-bottom: 1px solid var(--border); }
+    .meta-item:last-child { border-bottom: 0; }
+  }
+</style>

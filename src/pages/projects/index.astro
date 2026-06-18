@@ -1,0 +1,148 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
+
+const projects = (
+  await getCollection('projects', ({ data }) => !data.draft)
+).sort((a, b) => a.data.order - b.data.order);
+
+const categories = [
+  'AI Systems',
+  'Product / Full-Stack',
+  'Data & Operations',
+  'Developer Tools',
+];
+const count = (c: string) =>
+  projects.filter((p) => p.data.category === c).length;
+---
+
+<BaseLayout
+  title="Work — Erick Ti"
+  description="Selected engineering projects by Erick Ti: production AI systems, full-stack products, data pipelines, and developer tooling."
+>
+  <section class="wrap head">
+    <p class="kicker" data-reveal>// project index</p>
+    <h1 class="display title" data-reveal>Selected work.</h1>
+    <p class="intro" data-reveal>
+      Production systems and personal builds. Filter by discipline to
+      see the slice most relevant to your role.
+    </p>
+  </section>
+
+  <section class="wrap">
+    {/* ---- filter bar ---- */}
+    <div class="filters" role="group" aria-label="Filter projects by discipline">
+      <button class="filter is-active" data-filter="all">
+        All <span class="fc">{String(projects.length).padStart(2, '0')}</span>
+      </button>
+      {
+        categories.map((c) => (
+          <button class="filter" data-filter={c}>
+            {c} <span class="fc">{String(count(c)).padStart(2, '0')}</span>
+          </button>
+        ))
+      }
+    </div>
+
+    <p class="empty mono" hidden>No projects in this lane yet.</p>
+
+    {/* ---- grid ---- */}
+    <div class="grid" id="project-grid">
+      {projects.map((p, i) => <ProjectCard project={p} index={i + 1} />)}
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  const buttons = document.querySelectorAll<HTMLButtonElement>('.filter');
+  const cards = document.querySelectorAll<HTMLElement>('#project-grid .card');
+  const empty = document.querySelector<HTMLElement>('.empty');
+
+  function apply(filter: string) {
+    let visible = 0;
+    cards.forEach((card) => {
+      const match = filter === 'all' || card.dataset.category === filter;
+      card.style.display = match ? '' : 'none';
+      if (match) visible++;
+    });
+    if (empty) empty.hidden = visible !== 0;
+    buttons.forEach((b) =>
+      b.classList.toggle('is-active', b.dataset.filter === filter)
+    );
+  }
+
+  buttons.forEach((b) =>
+    b.addEventListener('click', () => {
+      const f = b.dataset.filter ?? 'all';
+      apply(f);
+      const url = new URL(window.location.href);
+      if (f === 'all') url.searchParams.delete('lane');
+      else url.searchParams.set('lane', f);
+      history.replaceState(null, '', url);
+    })
+  );
+
+  // honour ?lane= deep link from the homepage discipline cards
+  const lane = new URLSearchParams(window.location.search).get('lane');
+  if (lane && [...buttons].some((b) => b.dataset.filter === lane)) {
+    apply(lane);
+  }
+</script>
+
+<style>
+  .head { padding-block: clamp(3rem, 8vh, 6rem) 2.5rem; }
+  .title { margin-top: 1rem; }
+  .intro {
+    font-family: var(--font-mono);
+    font-size: 0.95rem;
+    color: var(--text-dim);
+    max-width: 50ch;
+    margin-top: 1.4rem;
+    line-height: 1.7;
+  }
+
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    padding-bottom: 2.2rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .filter {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.02em;
+    color: var(--text-dim);
+    padding: 0.55rem 0.9rem;
+    border: 1px solid var(--border);
+    background: var(--bg-elevated);
+    transition: color 0.2s var(--ease), border-color 0.2s var(--ease),
+      background 0.2s var(--ease);
+  }
+  .filter:hover { color: var(--text); border-color: var(--border-bright); }
+  .filter.is-active {
+    color: #000;
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+  .fc { opacity: 0.6; margin-left: 0.25rem; font-size: 0.7rem; }
+  .filter.is-active .fc { opacity: 0.75; }
+
+  .empty {
+    margin-top: 3rem;
+    color: var(--text-faint);
+    font-size: 0.9rem;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+    margin-top: 2.5rem;
+    padding-bottom: 2rem;
+  }
+  @media (max-width: 760px) {
+    .grid { grid-template-columns: 1fr; }
+  }
+</style>

@@ -1,0 +1,368 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+
+const all = (await getCollection('projects', ({ data }) => !data.draft)).sort(
+  (a, b) => a.data.order - b.data.order
+);
+const featured = all.filter((p) => p.data.featured);
+
+const stats = [
+  { value: '15+', label: 'production tools shipped' },
+  { value: '200+', label: 'internal users served' },
+  { value: '$12M+', label: 'shipments validated' },
+  { value: '2 sites', label: 'manufacturing footprint' },
+];
+
+const lanes = [
+  {
+    code: 'AI Systems',
+    blurb: 'LLM assistants, tool-calling, retrieval, embeddings.',
+  },
+  {
+    code: 'Product / Full-Stack',
+    blurb: 'Typed APIs, React frontends, the whole stack.',
+  },
+  {
+    code: 'Data & Operations',
+    blurb: 'Pipelines, telemetry, ERP integration, SQL at scale.',
+  },
+  {
+    code: 'Developer Tools',
+    blurb: 'Workflow automation and reproducible environments.',
+  },
+];
+const laneCount = (c: string) => all.filter((p) => p.data.category === c).length;
+---
+
+<BaseLayout>
+  {/* ============================ HERO ============================ */}
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div class="hero-main">
+        <p class="kicker h-anim" style="--d:0ms">
+          // software engineer — ai · data · product
+        </p>
+        <h1 class="display h-anim" style="--d:90ms">
+          I build production systems for the <span class="accent"
+            >messy</span
+          > parts of the real world.
+        </h1>
+        <p class="hero-sub h-anim" style="--d:200ms">
+          AI assistants, data-heavy platforms, and internal products —
+          shipped where correctness, scale, and real users actually
+          matter. Not toy projects.
+        </p>
+        <div class="hero-cta h-anim" style="--d:300ms">
+          <a href="/projects" class="btn btn--solid">
+            View selected work <span class="arr">→</span>
+          </a>
+          <a href="/about" class="btn">About me</a>
+        </div>
+      </div>
+
+      <aside class="panel h-anim" style="--d:400ms" aria-label="Status">
+        <div class="panel-row">
+          <span class="p-key">loc</span>
+          <span class="p-val">Fremont, CA · USA</span>
+        </div>
+        <div class="panel-row">
+          <span class="p-key">role</span>
+          <span class="p-val">Software Engineer</span>
+        </div>
+        <div class="panel-row">
+          <span class="p-key">focus</span>
+          <span class="p-val">Production AI / LLM systems</span>
+        </div>
+        <div class="panel-row">
+          <span class="p-key">status</span>
+          <span class="p-val">
+            <span class="live"></span>open to new roles
+          </span>
+        </div>
+        <div class="panel-row">
+          <span class="p-key">stack</span>
+          <span class="p-val">Python · TypeScript · SQL</span>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  {/* ========================= STAT STRIP ========================= */}
+  <section class="wrap">
+    <hr class="rule" />
+    <ul class="stats">
+      {
+        stats.map((s, i) => (
+          <li data-reveal data-reveal-delay={i * 80}>
+            <span class="s-value mono">{s.value}</span>
+            <span class="s-label">{s.label}</span>
+          </li>
+        ))
+      }
+    </ul>
+    <hr class="rule" />
+  </section>
+
+  {/* ======================= FEATURED WORK ======================= */}
+  <section class="section wrap">
+    <div class="label" data-reveal>
+      <span>Selected Work</span>
+      <span class="idx">01 / 02</span>
+    </div>
+    <h2 class="heading sec-head" data-reveal>
+      Three projects worth a closer look.
+    </h2>
+
+    <div class="feature-grid">
+      {
+        featured.map((p, i) => (
+          <ProjectCard project={p} index={i + 1} />
+        ))
+      }
+    </div>
+
+    <a href="/projects" class="all-link mono" data-reveal>
+      See all {all.length} projects <span class="arr">→</span>
+    </a>
+  </section>
+
+  {/* ======================== LANES ======================== */}
+  <section class="section wrap">
+    <hr class="rule" />
+    <div class="label lanes-label" data-reveal>
+      <span>Disciplines</span>
+      <span class="idx">02 / 02</span>
+    </div>
+    <h2 class="heading sec-head" data-reveal>
+      Four lanes. One engineer.
+    </h2>
+    <p class="lanes-intro" data-reveal>
+      The work spans a few distinct disciplines. Filter the project
+      index by whichever one matches the role you&rsquo;re hiring for.
+    </p>
+
+    <div class="lanes">
+      {
+        lanes.map((lane, i) => (
+          <a
+            href={`/projects?lane=${encodeURIComponent(lane.code)}`}
+            class="lane"
+            data-reveal
+            data-reveal-delay={i * 70}
+          >
+            <div class="lane-top">
+              <span class="lane-code mono">{lane.code}</span>
+              <span class="lane-count mono">
+                {String(laneCount(lane.code)).padStart(2, '0')}
+              </span>
+            </div>
+            <p class="lane-blurb">{lane.blurb}</p>
+            <span class="lane-arr mono">filter →</span>
+          </a>
+        ))
+      }
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  /* ---- hero ---- */
+  .hero { padding-block: clamp(3.5rem, 9vh, 7rem) clamp(3rem, 6vh, 5rem); }
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1.65fr 1fr;
+    gap: clamp(2rem, 5vw, 4.5rem);
+    align-items: start;
+  }
+  .hero-sub {
+    font-family: var(--font-mono);
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: var(--text-dim);
+    max-width: 46ch;
+    margin-top: 1.6rem;
+  }
+  .display { margin-top: 1.5rem; }
+  .hero-cta { display: flex; gap: 0.8rem; margin-top: 2.2rem; flex-wrap: wrap; }
+
+  /* hero load animation */
+  .h-anim {
+    opacity: 0;
+    transform: translateY(16px);
+    animation: rise 0.8s var(--ease) forwards;
+    animation-delay: var(--d);
+  }
+  @keyframes rise {
+    to { opacity: 1; transform: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .h-anim { animation: none; opacity: 1; transform: none; }
+  }
+
+  /* ---- instrument panel ---- */
+  .panel {
+    border: 1px solid var(--border);
+    background: var(--bg-elevated);
+    padding: 0.4rem 0;
+    position: relative;
+  }
+  .panel::before {
+    content: 'SYS.STATUS';
+    position: absolute;
+    top: -0.62rem;
+    left: 1rem;
+    background: var(--bg);
+    padding: 0 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.16em;
+    color: var(--text-faint);
+  }
+  .panel-row {
+    display: flex;
+    gap: 1rem;
+    padding: 0.62rem 1.1rem;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .panel-row:last-child { border-bottom: 0; }
+  .p-key {
+    color: var(--text-faint);
+    width: 3.4rem;
+    flex: none;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    align-self: center;
+  }
+  .p-val { color: var(--text); }
+  .live {
+    display: inline-block;
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--signal-green);
+    margin-right: 0.45rem;
+    box-shadow: 0 0 8px var(--signal-green);
+  }
+
+  /* ---- stats ---- */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    list-style: none;
+    padding-block: 2rem;
+  }
+  .stats li {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    padding-inline: 1.5rem;
+    border-left: 1px solid var(--border);
+  }
+  .stats li:first-child { padding-left: 0; border-left: 0; }
+  .s-value {
+    font-size: clamp(1.8rem, 3.5vw, 2.7rem);
+    color: var(--accent);
+    letter-spacing: -0.02em;
+  }
+  .s-label {
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  /* ---- section heads ---- */
+  .sec-head { margin-top: 1.3rem; max-width: 18ch; }
+
+  /* ---- featured grid ---- */
+  .feature-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.25rem;
+    margin-top: 2.8rem;
+  }
+  .all-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 2rem;
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    border-bottom: 1px solid var(--accent-line);
+    padding-bottom: 2px;
+    transition: color 0.2s var(--ease);
+  }
+  .all-link:hover { color: var(--accent); }
+
+  /* ---- lanes ---- */
+  .lanes-label { margin-top: 3rem; }
+  .lanes-intro {
+    color: var(--text-dim);
+    max-width: 52ch;
+    margin-top: 1rem;
+    font-size: 0.98rem;
+  }
+  .lanes {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-top: 2.6rem;
+  }
+  .lane {
+    border: 1px solid var(--border);
+    background: var(--bg-elevated);
+    padding: 1.3rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    min-height: 170px;
+    transition: border-color 0.25s var(--ease), transform 0.25s var(--ease);
+  }
+  .lane:hover { border-color: var(--accent); transform: translateY(-3px); }
+  .lane-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .lane-code {
+    font-size: 0.82rem;
+    color: var(--text);
+    letter-spacing: 0.02em;
+  }
+  .lane-count { font-size: 0.78rem; color: var(--accent); }
+  .lane-blurb {
+    font-size: 0.86rem;
+    color: var(--text-dim);
+    line-height: 1.5;
+    flex: 1;
+  }
+  .lane-arr {
+    font-size: 0.74rem;
+    color: var(--text-faint);
+    transition: color 0.2s var(--ease);
+  }
+  .lane:hover .lane-arr { color: var(--accent); }
+
+  /* ---- responsive ---- */
+  @media (max-width: 940px) {
+    .hero-grid { grid-template-columns: 1fr; }
+    .panel { max-width: 420px; }
+    .feature-grid { grid-template-columns: 1fr; }
+    .stats { grid-template-columns: repeat(2, 1fr); gap: 1.5rem 0; }
+    .stats li:nth-child(3) { padding-left: 0; border-left: 0; }
+    .lanes { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 480px) {
+    .lanes { grid-template-columns: 1fr; }
+    .stats { grid-template-columns: 1fr; }
+    .stats li, .stats li:nth-child(3) {
+      padding-left: 0; border-left: 0;
+      border-top: 1px solid var(--border);
+      padding-top: 1.2rem;
+    }
+    .stats li:first-child { border-top: 0; padding-top: 0; }
+  }
+</style>

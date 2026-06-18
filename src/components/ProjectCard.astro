@@ -1,0 +1,217 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  project: CollectionEntry<'projects'>;
+  index: number;
+}
+
+const { project, index } = Astro.props;
+const { data } = project;
+const num = String(index).padStart(2, '0');
+
+const VIS: Record<string, { label: string; cls: string }> = {
+  public: { label: 'Public', cls: 'pub' },
+  'private-production': { label: 'Production', cls: 'prod' },
+  concept: { label: 'Concept', cls: 'concept' },
+};
+const vis = VIS[data.visibility];
+---
+
+<a
+  href={`/projects/${project.id}`}
+  class="card"
+  data-category={data.category}
+  data-reveal
+>
+  {
+    data.coverImage && (
+      <div class="card-media">
+        <img src={data.coverImage} alt={data.coverAlt ?? ''} loading="lazy" />
+      </div>
+    )
+  }
+
+  <div class="card-top">
+    <span class="num mono">{num}</span>
+    <span class="card-top-meta">
+      <span class:list={['vis', `vis--${vis.cls}`]}>{vis.label}</span>
+      <span class="status" data-status={data.status}>
+        <span class="dot"></span>{data.status}
+      </span>
+    </span>
+  </div>
+
+  <div class="card-body">
+    <span class="cat mono">{data.category}</span>
+    <h3 class="title">{data.title}</h3>
+    <p class="tagline">{data.tagline}</p>
+  </div>
+
+  {
+    data.metrics.length > 0 && (
+      <ul class="metrics">
+        {data.metrics.slice(0, 3).map((m) => (
+          <li>
+            <span class="m-value mono">{m.value}</span>
+            <span class="m-label">{m.label}</span>
+          </li>
+        ))}
+      </ul>
+    )
+  }
+
+  <div class="card-foot">
+    <ul class="stack">
+      {data.stack.slice(0, 5).map((t) => <li class="tag">{t}</li>)}
+    </ul>
+    <span class="go mono">View case study <span class="arr">→</span></span>
+  </div>
+</a>
+
+<style>
+  .card {
+    display: flex;
+    flex-direction: column;
+    gap: 1.4rem;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    --card-pad: clamp(1.4rem, 3vw, 2.1rem);
+    padding: var(--card-pad);
+    position: relative;
+    transition: border-color 0.3s var(--ease), transform 0.3s var(--ease),
+      background 0.3s var(--ease);
+    height: 100%;
+  }
+  /* corner tick — instrument-panel detail */
+  .card::after {
+    content: '';
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 9px;
+    height: 9px;
+    border-top: 1px solid var(--border-bright);
+    border-right: 1px solid var(--border-bright);
+    transition: border-color 0.3s var(--ease);
+  }
+  .card:hover {
+    border-color: var(--border-bright);
+    transform: translateY(-4px);
+    background: var(--bg-panel);
+  }
+  .card:hover::after { border-color: var(--accent); }
+
+  .card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem 0.75rem;
+  }
+  .num {
+    font-size: 0.95rem;
+    color: var(--accent);
+    letter-spacing: 0.05em;
+  }
+
+  /* cover image — full-bleed to the card edges */
+  .card-media {
+    margin: calc(-1 * var(--card-pad)) calc(-1 * var(--card-pad)) 0;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-panel);
+  }
+  .card-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.45s var(--ease);
+  }
+  .card:hover .card-media img { transform: scale(1.04); }
+
+  /* visibility chip */
+  .card-top-meta { display: flex; align-items: center; gap: 0.55rem; }
+  .vis {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    padding: 0.24rem 0.46rem;
+    border: 1px solid var(--border);
+    color: var(--text-faint);
+    white-space: nowrap;
+  }
+  .vis--prod {
+    color: var(--accent);
+    border-color: var(--accent-line);
+    background: var(--accent-soft);
+  }
+  .vis--concept { color: var(--text-dim); }
+
+  .card-body { display: flex; flex-direction: column; gap: 0.6rem; }
+  .cat {
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+  }
+  .title {
+    font-family: var(--font-serif);
+    font-weight: 400;
+    font-size: clamp(1.7rem, 3vw, 2.3rem);
+    line-height: 1.05;
+    transition: color 0.25s var(--ease);
+  }
+  .card:hover .title { color: var(--accent); }
+  .tagline {
+    color: var(--text-dim);
+    font-size: 0.95rem;
+    max-width: 42ch;
+  }
+
+  .metrics {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem 2rem;
+    list-style: none;
+    padding-top: 1.2rem;
+    border-top: 1px solid var(--border);
+  }
+  .metrics li { display: flex; flex-direction: column; gap: 0.15rem; }
+  .m-value {
+    font-size: 1.35rem;
+    color: var(--text);
+    letter-spacing: -0.01em;
+  }
+  .m-label {
+    font-size: 0.72rem;
+    color: var(--text-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .card-foot {
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    list-style: none;
+  }
+  .go {
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .card:hover .go { color: var(--accent); }
+  .card:hover .arr { transform: translateX(4px); }
+  .arr { transition: transform 0.25s var(--ease); }
+</style>

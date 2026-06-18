@@ -1,0 +1,75 @@
+---
+const year = new Date().getFullYear();
+
+const links = [
+  { label: 'Email', href: 'mailto:hello@erickti.dev', ext: false },
+  { label: 'GitHub', href: 'https://github.com/erick-ti', ext: true },
+  { label: 'LinkedIn', href: 'https://www.linkedin.com/in/erick-ti', ext: true },
+];
+---
+
+<footer class="site-footer">
+  <hr class="rule" />
+  <div class="wrap inner">
+    <div class="cta" data-reveal>
+      <p class="kicker">// open to new roles</p>
+      <p class="line">
+        Looking for engineers who ship? <a href="mailto:hello@erickti.dev"
+          class="tlink">Let&rsquo;s talk →</a
+        >
+      </p>
+    </div>
+
+    <div class="meta">
+      <nav class="links" aria-label="Contact">
+        {
+          links.map((l) => (
+            <a
+              href={l.href}
+              class="flink"
+              {...l.ext ? { target: '_blank', rel: 'noopener' } : {}}
+            >
+              {l.label}
+              {l.ext && <span class="arr">↗</span>}
+            </a>
+          ))
+        }
+      </nav>
+      <p class="colophon mono">
+        © {year} Erick Ti · Designed &amp; built with Astro
+      </p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer { margin-top: 2rem; }
+  .inner { padding-block: clamp(3rem, 7vh, 5rem); }
+  .cta { margin-bottom: 3rem; }
+  .line {
+    font-family: var(--font-serif);
+    font-size: clamp(1.7rem, 4vw, 2.9rem);
+    line-height: 1.15;
+    margin-top: 0.8rem;
+    max-width: 20ch;
+  }
+  .meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 1.25rem;
+    border-top: 1px solid var(--border);
+    padding-top: 1.5rem;
+  }
+  .links { display: flex; gap: 1.5rem; }
+  .flink {
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    color: var(--text-dim);
+    transition: color 0.2s var(--ease);
+  }
+  .flink:hover { color: var(--accent); }
+  .flink .arr { font-size: 0.7rem; margin-left: 0.15rem; }
+  .colophon { font-size: 0.7rem; color: var(--text-faint); }
+</style>
