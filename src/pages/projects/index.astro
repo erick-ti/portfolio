@@ -33,12 +33,12 @@ const count = (c: string) =>
   <section class="wrap">
     {/* ---- filter bar ---- */}
     <div class="filters" role="group" aria-label="Filter projects by discipline">
-      <button class="filter is-active" data-filter="all">
+      <button class="filter is-active" data-filter="all" aria-pressed="true">
         All <span class="fc">{String(projects.length).padStart(2, '0')}</span>
       </button>
       {
         categories.map((c) => (
-          <button class="filter" data-filter={c}>
+          <button class="filter" data-filter={c} aria-pressed="false">
             {c} <span class="fc">{String(count(c)).padStart(2, '0')}</span>
           </button>
         ))
@@ -49,7 +49,9 @@ const count = (c: string) =>
 
     {/* ---- grid ---- */}
     <div class="grid" id="project-grid">
-      {projects.map((p, i) => <ProjectCard project={p} index={i + 1} />)}
+      {projects.map((p, i) => (
+        <ProjectCard project={p} index={i + 1} lead={i === 0} />
+      ))}
     </div>
   </section>
 </BaseLayout>
@@ -67,9 +69,11 @@ const count = (c: string) =>
       if (match) visible++;
     });
     if (empty) empty.hidden = visible !== 0;
-    buttons.forEach((b) =>
-      b.classList.toggle('is-active', b.dataset.filter === filter)
-    );
+    buttons.forEach((b) => {
+      const on = b.dataset.filter === filter;
+      b.classList.toggle('is-active', on);
+      b.setAttribute('aria-pressed', String(on));
+    });
   }
 
   buttons.forEach((b) =>
@@ -142,6 +146,8 @@ const count = (c: string) =>
     margin-top: 2.5rem;
     padding-bottom: 2rem;
   }
+  /* the first card leads full-width (asymmetric, matches the homepage) */
+  .grid > :global(.card--lead) { grid-column: 1 / -1; }
   @media (max-width: 760px) {
     .grid { grid-template-columns: 1fr; }
   }

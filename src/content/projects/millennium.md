@@ -2,31 +2,36 @@
 title: 'Millennium'
 tagline: 'A full-stack collection tracker for trading-card players — catalog, pricing, and deck data in one typed, containerized app.'
 category: 'Product / Full-Stack'
-status: 'In Progress'
+status: 'Shipped'
 visibility: 'public'
 featured: true
 order: 2
 timeframe: '2024 — Present'
 role: 'Sole engineer — personal product'
 stack:
-  - FastAPI
+  - Django
+  - Django REST Framework
   - PostgreSQL
-  - SQLAlchemy 2.0
-  - Alembic
+  - Celery
+  - Next.js
   - React
   - TypeScript
   - TanStack Query
   - Tailwind
   - Docker
 metrics:
-  - value: 'End-to-end'
-    label: 'type safety'
-  - value: 'Dockerized'
-    label: 'one-command setup'
-  - value: 'Portfolio'
-    label: 'flagship build'
+  - value: '10'
+    label: 'Django apps'
+  - value: '14'
+    label: 'typed React screens'
+  - value: 'Per-lot'
+    label: 'cost-basis valuation'
 links:
-  repo: 'https://github.com/erick-ti'
+  live: 'https://millennium.erickti.com'
+  repo: 'https://github.com/erick-ti/millennium'
+coverImage: '/projects/millennium/cover.jpg'
+coverAlt: 'The Millennium "Vault" landing page — a trading-card collection appraised like a financial portfolio, anchored by a live foil appraisal card.'
+ogImage: '/projects/millennium/cover.jpg'
 ---
 
 ## Context
@@ -45,22 +50,25 @@ control end to end, built with the same stack I'd use professionally.
 
 ## Architecture
 
-The backend is FastAPI with SQLAlchemy 2.0's typed ORM over PostgreSQL,
-with Alembic managing schema migrations. The frontend is React +
-TypeScript on Vite, using TanStack Query for server-state caching and
-Tailwind with shadcn/ui for the interface. The whole stack runs under
-Docker Compose, so a fresh environment is one command.
+The backend is Django with Django REST Framework over PostgreSQL, with
+Celery running the background jobs (catalog sync, price snapshots). The
+frontend is Next.js with React and TypeScript, using TanStack Query for
+server-state caching and Tailwind with shadcn/ui for the interface. The
+whole stack runs under Docker Compose, so a fresh environment is one
+command.
 
 ## Technical highlights
 
-- **One contract, both ends.** Pydantic schemas define the API
-  contract and flow into TypeScript types, so the frontend and backend
-  can't silently drift apart.
-- **Migrations from day one.** Alembic was wired in before the schema
-  got interesting — card data evolves, and the history is tracked.
-- **Reproducible by default.** Docker Compose means the project runs
-  identically on any machine, which matters for a portfolio piece a
-  recruiter might actually clone.
+- **Per-lot cost basis, append-only valuation.** Every acquisition
+  keeps its own cost, daily portfolio snapshots are append-only, and a
+  database CHECK constraint stops a gain from ever displaying without
+  complete price coverage — partial data can't masquerade as complete.
+- **Confidence-scored catalog matching.** Imported cards reconcile
+  against the catalog (TCGCSV / YGOPRODeck) into EXACT vs. review tiers,
+  so a fuzzy match never silently becomes a holding.
+- **Reproducible by default.** Django migrations version every schema
+  change, and Docker Compose runs the whole stack identically on any
+  machine — which matters for a piece a recruiter might actually clone.
 
 ## Tradeoffs
 
@@ -71,6 +79,7 @@ purpose.
 
 ## Outcome
 
-In active development. The data model and API are taking shape, and the
-project is the clearest end-to-end demonstration of how I build a
-product from an empty repo.
+Shipped and live at millennium.erickti.com — a production-standard build
+(typed Django/DRF API, Celery jobs, per-lot valuation with append-only
+snapshots, confidence-scored catalog matching), actively maintained. It's the
+clearest end-to-end demonstration of how I build a system from an empty repo.

@@ -49,9 +49,27 @@ const ogImage = image ? new URL(image, Astro.site) : undefined;
     {ogImage && <meta name="twitter:image" content={ogImage} />}
 
     <meta name="theme-color" content="#0b0b0d" />
+
+    <!-- Arm the homepage intro before first paint (no flash). Plays on every
+         homepage load; skipped for reduced-motion and every non-homepage page. -->
+    <script is:inline>
+      (function () {
+        try {
+          var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+          // Plays on every load of the homepage (not reduced-motion).
+          if (location.pathname === '/' && !reduce) {
+            document.documentElement.classList.add('intro');
+            // hard fallback: never let the hero stay hidden if JS stalls
+            setTimeout(function () {
+              document.documentElement.classList.remove('intro');
+            }, 4000);
+          }
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
-    <a href="#main" class="sr-only">Skip to content</a>
+    <a href="#main" class="skip-link">Skip to content</a>
     <Header />
     <main id="main">
       <slot />

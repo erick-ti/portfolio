@@ -73,10 +73,6 @@ const principles = [
           collection tracker, a music recommender that listens to the audio
           itself. Same instinct, fewer constraints.
         </p>
-        <p class="bio-note mono">
-          <span class="accent">Note —</span> placeholder copy. Swap this for
-          your own voice; the layout stays.
-        </p>
       </div>
 
       <aside class="quick" data-reveal>
@@ -85,7 +81,12 @@ const principles = [
         <div class="q-row"><span class="q-k">Core</span><span>Python · TS · SQL</span></div>
         <div class="q-row"><span class="q-k">Also</span><span>C#/.NET · AWS</span></div>
         <div class="q-row"><span class="q-k">Open to</span><span>Hybrid / remote SWE</span></div>
-        <a href="/resume.pdf" class="btn q-btn">
+        <a
+          href="/resume.pdf"
+          class="btn q-btn"
+          target="_blank"
+          rel="noopener"
+        >
           Download resume <span class="arr">↗</span>
         </a>
       </aside>
@@ -150,18 +151,24 @@ const principles = [
   }
   .bio > p { color: var(--text-dim); font-size: 1.05rem; }
   .bio > p + p { margin-top: 1.1rem; }
-  .bio-note {
-    font-size: 0.8rem !important;
-    color: var(--text-faint) !important;
-    border: 1px solid var(--border);
-    padding: 0.7rem 0.9rem;
-    margin-top: 1.6rem;
-  }
 
   .quick {
     border: 1px solid var(--border);
     background: var(--bg-elevated);
     padding: 0.4rem 0;
+    position: relative;
+  }
+  .quick::before {
+    content: 'PROFILE';
+    position: absolute;
+    top: -0.62rem;
+    left: 1rem;
+    background: var(--bg);
+    padding: 0 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.16em;
+    color: var(--text-faint);
   }
   .q-row {
     display: flex;

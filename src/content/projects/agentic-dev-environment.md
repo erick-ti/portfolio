@@ -15,12 +15,12 @@ stack:
   - Ghostty
   - macOS
 metrics:
-  - value: 'Symlinked'
-    label: 'dotfiles repo'
-  - value: 'Custom'
-    label: 'slash commands'
+  - value: '6'
+    label: 'custom Claude Code commands'
+  - value: 'One-command'
+    label: 'machine bootstrap'
   - value: 'Multi-model'
-    label: 'agent workflow'
+    label: 'Claude + Codex workflow'
 links:
   repo: 'https://github.com/erick-ti/dotfiles'
 ---
