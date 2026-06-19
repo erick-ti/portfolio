@@ -1,6 +1,7 @@
 ---
 import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import FoilAppraisalCard from '../../components/FoilAppraisalCard.astro';
 
 export async function getStaticPaths() {
   const projects = (
@@ -33,6 +34,7 @@ const VIS: Record<string, { label: string; cls: string }> = {
   concept: { label: 'Personal / concept', cls: 'concept' },
 };
 const vis = VIS[data.visibility];
+const isMillennium = project.id === 'millennium';
 ---
 
 <BaseLayout
@@ -61,13 +63,42 @@ const vis = VIS[data.visibility];
       <p class="tagline" data-reveal>{data.tagline}</p>
     </header>
 
-    {/* ---- cover hero ---- */}
+    {/* ---- hero: cover image, or the live foil artifact for Millennium ---- */}
     {
-      data.coverImage && (
+      isMillennium ? (
         <div class="wrap">
-          <figure class="hero-media" data-reveal>
-            <img src={data.coverImage} alt={data.coverAlt ?? data.title} />
+          <figure class="foil-hero" data-reveal>
+            <FoilAppraisalCard />
+            <figcaption class="foil-hero-cap mono">
+              Illustrative readout from Millennium&rsquo;s lot-cost valuation
+              pipeline — per-lot cost basis, append-only daily snapshots, and
+              confidence-scored catalog matching. Values are illustrative.
+            </figcaption>
           </figure>
+        </div>
+      ) : (
+        data.coverImage && (
+          <div class="wrap">
+            <figure class="hero-media" data-reveal>
+              <img src={data.coverImage} alt={data.coverAlt ?? data.title} />
+            </figure>
+          </div>
+        )
+      )
+    }
+
+    {/* ---- metrics — lead with the proof ---- */}
+    {
+      data.metrics.length > 0 && (
+        <div class="wrap">
+          <ul class="metrics" data-reveal>
+            {data.metrics.map((m) => (
+              <li>
+                <span class="m-value mono">{m.value}</span>
+                <span class="m-label">{m.label}</span>
+              </li>
+            ))}
+          </ul>
         </div>
       )
     }
@@ -118,22 +149,6 @@ const vis = VIS[data.visibility];
         </div>
       </dl>
     </div>
-
-    {/* ---- metrics ---- */}
-    {
-      data.metrics.length > 0 && (
-        <div class="wrap">
-          <ul class="metrics" data-reveal>
-            {data.metrics.map((m) => (
-              <li>
-                <span class="m-value mono">{m.value}</span>
-                <span class="m-label">{m.label}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )
-    }
 
     {/* ---- body ---- */}
     <div class="wrap body" data-reveal>
@@ -220,6 +235,22 @@ const vis = VIS[data.visibility];
     overflow: hidden;
   }
   .hero-media img { width: 100%; height: 100%; object-fit: cover; }
+
+  /* foil artifact hero (Millennium — no cover art, so the live model leads) */
+  .foil-hero {
+    margin-top: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.3rem;
+  }
+  .foil-hero-cap {
+    font-size: 0.78rem;
+    line-height: 1.7;
+    color: var(--text-faint);
+    max-width: 54ch;
+    text-align: center;
+  }
 
   /* screenshots */
   .shots { padding-bottom: 3.5rem; }
