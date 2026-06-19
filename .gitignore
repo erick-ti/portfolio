@@ -25,7 +25,5 @@ yarn-error.log*
 !.vscode/extensions.json
 .idea/
 
-# strategy / planning docs — kept local so internal project names,
-# candid copy notes, and positioning strategy stay off the public repo
+# local-only planning / strategy docs
 ROADMAP.md
-docs/NORTH_STAR.md
