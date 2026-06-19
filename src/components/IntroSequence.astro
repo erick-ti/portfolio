@@ -1,0 +1,212 @@
+---
+/**
+ * Cinematic homepage intro — plays on every homepage load, then dissolves into
+ * the hero. Whether it arms at all (homepage only, not reduced-motion) is
+ * decided by the inline gate script in BaseLayout's <head>, which adds
+ * `html.intro` before first paint so nothing flashes. This component only
+ * renders the overlay + the dismiss logic. Skippable by any click / key /
+ * scroll; the hero's load animation is paused until the intro hands off.
+ *
+ * Animation principle: every element's BASE state is its final, visible state;
+ * the keyframes animate *from* the hidden state with `backwards` fill. So if an
+ * animation never runs (old browser, etc.) the assembled intro still shows.
+ */
+---
+
+<div class="intro-overlay" id="intro" aria-hidden="true">
+  <div class="intro-grid"></div>
+  <div class="intro-stage">
+    <div class="intro-lockup">
+      <span class="intro-cursor">▌</span>
+      <span class="intro-word">ERICK&nbsp;TI</span>
+    </div>
+    <div class="intro-seam"></div>
+    <p class="intro-tag">// systems that survive contact with the real world</p>
+  </div>
+  <span class="intro-hint">click anywhere to enter</span>
+</div>
+
+<style>
+  .intro-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    display: none;
+    place-items: center;
+    background: var(--bg);
+    overflow: hidden;
+    clip-path: inset(0 0 0 0);
+    transition: clip-path 0.75s var(--ease), opacity 0.4s 0.5s var(--ease);
+  }
+  :global(html.intro) .intro-overlay { display: grid; }
+
+  /* exit: collapse to the seam line + fade, revealing the hero underneath */
+  .intro-overlay.intro-overlay--out {
+    clip-path: inset(50% 0 50% 0);
+    opacity: 0;
+  }
+  .intro-overlay--out .intro-stage {
+    opacity: 0;
+    transform: scale(0.96);
+    transition: opacity 0.3s var(--ease), transform 0.5s var(--ease);
+  }
+
+  /* igniting instrument grid (radial-masked so it's densest center) */
+  .intro-grid {
+    position: absolute;
+    inset: -2px;
+    background-image:
+      linear-gradient(var(--border) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 72px 72px;
+    opacity: 0.5;
+    -webkit-mask-image: radial-gradient(120% 90% at 50% 50%, #000 20%, transparent 76%);
+    mask-image: radial-gradient(120% 90% at 50% 50%, #000 20%, transparent 76%);
+    animation: intro-grid-in 0.9s var(--ease) backwards;
+  }
+
+  .intro-stage { position: relative; text-align: center; padding-inline: 1.5rem; }
+  /* amber bloom behind the wordmark */
+  .intro-stage::before {
+    content: '';
+    position: absolute;
+    inset: -40% -15%;
+    z-index: -1;
+    background: radial-gradient(closest-side, rgba(240, 168, 48, 0.16), transparent 72%);
+    opacity: 1;
+    animation: intro-bloom 1.5s 0.55s var(--ease) backwards;
+  }
+
+  .intro-lockup {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    transform: scale(1);
+    animation: intro-settle 1.3s 0.3s var(--ease) backwards;
+  }
+  .intro-cursor {
+    font-family: var(--font-mono);
+    font-size: clamp(1.6rem, 5vw, 3.4rem);
+    color: var(--accent);
+    animation: intro-blink 1.05s steps(1) infinite;
+  }
+  .intro-word {
+    font-family: var(--font-serif);
+    font-weight: 400;
+    font-size: clamp(3.2rem, 13vw, 9.5rem);
+    line-height: 1;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+    background: linear-gradient(
+      94deg,
+      #9d814d 0%,
+      #e6c063 24%,
+      #fff3d0 45%,
+      #f0a830 60%,
+      #c8a24a 78%,
+      #8c6f3a 100%
+    );
+    background-size: 220% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    clip-path: inset(0 0 0 0);
+    animation:
+      intro-wipe 0.8s 0.35s var(--ease) backwards,
+      intro-sweep 1.7s 0.5s var(--ease) both;
+  }
+  .intro-seam {
+    height: 1px;
+    width: min(58vw, 520px);
+    margin: clamp(1rem, 3vw, 1.7rem) auto 0;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    transform: scaleX(1);
+    transform-origin: center;
+    animation: intro-seam-in 0.8s 1s var(--ease) backwards;
+  }
+  .intro-tag {
+    margin-top: 1.15rem;
+    font-family: var(--font-mono);
+    font-size: clamp(0.7rem, 1.6vw, 0.9rem);
+    letter-spacing: 0.16em;
+    color: var(--text-dim);
+    opacity: 1;
+    animation: intro-fade-up 0.6s 1.3s var(--ease) backwards;
+  }
+  .intro-hint {
+    position: absolute;
+    bottom: clamp(1.5rem, 5vh, 3rem);
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: var(--font-mono);
+    font-size: 0.64rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    opacity: 0.5;
+    animation: intro-hint 2.6s 1.9s var(--ease) infinite backwards;
+  }
+
+  @keyframes intro-grid-in {
+    from { opacity: 0; transform: scale(1.14); }
+    to { opacity: 0.5; transform: scale(1); }
+  }
+  @keyframes intro-bloom { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes intro-settle { from { transform: scale(0.97); } to { transform: scale(1); } }
+  @keyframes intro-blink { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+  @keyframes intro-wipe {
+    from { clip-path: inset(0 100% 0 0); }
+    to { clip-path: inset(0 0 0 0); }
+  }
+  @keyframes intro-sweep {
+    from { background-position: 0% 50%; }
+    to { background-position: 200% 50%; }
+  }
+  @keyframes intro-seam-in {
+    from { transform: scaleX(0); }
+    to { transform: scaleX(1); }
+  }
+  @keyframes intro-fade-up {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: none; }
+  }
+  @keyframes intro-hint { 0%, 100% { opacity: 0; } 30%, 70% { opacity: 0.55; } }
+
+  /* never animate for reduced-motion (the head gate also won't arm it) */
+  @media (prefers-reduced-motion: reduce) {
+    .intro-overlay { display: none !important; }
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    var html = document.documentElement;
+    if (!html.classList.contains('intro')) return;
+    var overlay = document.getElementById('intro');
+    if (!overlay) {
+      html.classList.remove('intro');
+      return;
+    }
+    var done = false;
+    var events = ['click', 'keydown', 'wheel', 'touchstart'];
+    function dismiss() {
+      if (done) return;
+      done = true;
+      overlay.classList.add('intro-overlay--out');
+      html.classList.add('intro-go'); // resumes the hero load animation
+      setTimeout(function () {
+        if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+        html.classList.remove('intro');
+        html.classList.remove('intro-go');
+      }, 850);
+      events.forEach(function (ev) {
+        window.removeEventListener(ev, dismiss);
+      });
+    }
+    events.forEach(function (ev) {
+      window.addEventListener(ev, dismiss, { passive: true });
+    });
+    setTimeout(dismiss, 2600);
+  })();
+</script>

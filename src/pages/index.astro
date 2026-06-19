@@ -2,11 +2,20 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ProjectCard from '../components/ProjectCard.astro';
+import FoilAppraisalCard from '../components/FoilAppraisalCard.astro';
+import IntroSequence from '../components/IntroSequence.astro';
 
 const all = (await getCollection('projects', ({ data }) => !data.draft)).sort(
   (a, b) => a.data.order - b.data.order
 );
 const featured = all.filter((p) => p.data.featured);
+
+// Millennium gets the signature spotlight; the rest fill the asymmetric
+// "Selected Work" grid, led by OTIS (the strongest professional proof).
+const spotlight = featured.find((p) => p.id === 'millennium') ?? null;
+const grid = featured.filter((p) => p.id !== 'millennium');
+const lead = grid.find((p) => p.id === 'teams-ai-assistant') ?? grid[0] ?? null;
+const others = grid.filter((p) => p.id !== lead?.id);
 
 const stats = [
   { value: '15+', label: 'production tools shipped' },
@@ -37,6 +46,8 @@ const laneCount = (c: string) => all.filter((p) => p.data.category === c).length
 ---
 
 <BaseLayout>
+  <IntroSequence />
+
   {/* ============================ HERO ============================ */}
   <section class="hero">
     <div class="wrap hero-grid">
@@ -45,8 +56,20 @@ const laneCount = (c: string) => all.filter((p) => p.data.category === c).length
           // software engineer — ai · data · product
         </p>
         <h1 class="display h-anim" style="--d:90ms">
-          I build production systems for the <span class="accent"
-            >messy</span
+          I build production systems for the <span class="ember"
+            >messy<span class="ember-sparks" aria-hidden="true"
+              ><i style="--x:10%;--y:30%;--dx:-1.3em;--dy:-.5em;--d:0s;--s:1"></i><i
+                style="--x:22%;--y:66%;--dx:-1.1em;--dy:.7em;--d:.7s;--s:.8"></i><i
+                style="--x:35%;--y:12%;--dx:-.4em;--dy:-1.2em;--d:.3s;--s:.9"></i><i
+                style="--x:50%;--y:50%;--dx:0;--dy:-1.4em;--d:1.1s;--s:1"></i><i
+                style="--x:62%;--y:10%;--dx:.5em;--dy:-1.2em;--d:.5s;--s:.7"></i><i
+                style="--x:86%;--y:32%;--dx:1.3em;--dy:-.5em;--d:1.5s;--s:.95"></i><i
+                style="--x:90%;--y:60%;--dx:1.4em;--dy:.4em;--d:.9s;--s:.85"></i><i
+                style="--x:78%;--y:80%;--dx:1em;--dy:1em;--d:2s;--s:.8"></i><i
+                style="--x:50%;--y:88%;--dx:0;--dy:1.3em;--d:1.3s;--s:.65"></i><i
+                style="--x:30%;--y:82%;--dx:-.9em;--dy:1em;--d:2.4s;--s:.9"></i><i
+                style="--x:45%;--y:30%;--dx:-.2em;--dy:-.9em;--d:1.8s;--s:.7"></i
+              ></span></span
           > parts of the real world.
         </h1>
         <p class="hero-sub h-anim" style="--d:200ms">
@@ -54,7 +77,11 @@ const laneCount = (c: string) => all.filter((p) => p.data.category === c).length
           shipped where correctness, scale, and real users actually
           matter. Not toy projects.
         </p>
-        <div class="hero-cta h-anim" style="--d:300ms">
+        <p class="hero-note h-anim" style="--d:300ms">
+          // the test I care about — does it survive real users, real money,
+          an actual factory floor?
+        </p>
+        <div class="hero-cta h-anim" style="--d:400ms">
           <a href="/projects" class="btn btn--solid">
             View selected work <span class="arr">→</span>
           </a>
@@ -109,17 +136,22 @@ const laneCount = (c: string) => all.filter((p) => p.data.category === c).length
   <section class="section wrap">
     <div class="label" data-reveal>
       <span>Selected Work</span>
-      <span class="idx">01 / 02</span>
+      <span class="idx">01 / 03</span>
     </div>
     <h2 class="heading sec-head" data-reveal>
-      Three projects worth a closer look.
+      A closer look at the work.
     </h2>
 
-    <div class="feature-grid">
+    <div class="features">
+      {lead && <ProjectCard project={lead} index={1} lead />}
       {
-        featured.map((p, i) => (
-          <ProjectCard project={p} index={i + 1} />
-        ))
+        others.length > 0 && (
+          <div class="feature-rest">
+            {others.map((p, i) => (
+              <ProjectCard project={p} index={i + 2} />
+            ))}
+          </div>
+        )
       }
     </div>
 
@@ -128,12 +160,89 @@ const laneCount = (c: string) => all.filter((p) => p.data.category === c).length
     </a>
   </section>
 
+  {/* ===================== SIGNATURE SPOTLIGHT ===================== */}
+  {
+    spotlight && (
+      <section class="spotlight-band">
+        <div class="wrap section">
+          <div class="label" data-reveal>
+            <span>Signature Build</span>
+            <span class="idx">02 / 03</span>
+          </div>
+          <h2 class="heading sec-head" data-reveal>
+            A collection, priced like a portfolio.
+          </h2>
+
+          <div class="spotlight" data-reveal>
+            <div class="spotlight-copy">
+              <p class="spotlight-lede">
+                <strong>{spotlight.data.title}</strong> is a full-stack
+                valuation system for a trading-card collection — Django/DRF
+                and Next.js, tracking per-lot cost basis, market movement, and
+                catalog-match confidence. The card beside this is one
+                holding&rsquo;s appraisal readout.
+              </p>
+
+              {spotlight.data.metrics.length > 0 && (
+                <ul class="spotlight-metrics">
+                  {spotlight.data.metrics.slice(0, 3).map((m) => (
+                    <li>
+                      <span class="m-value mono">{m.value}</span>
+                      <span class="m-label">{m.label}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+
+              <p class="spotlight-caption">
+                Illustrative readout modeled on Millennium&rsquo;s lot-cost
+                valuation pipeline — per-lot cost basis, append-only daily
+                snapshots, and confidence-scored catalog matching. Values are
+                illustrative.
+              </p>
+
+              <div class="spotlight-links">
+                {spotlight.data.links.live && (
+                  <a
+                    class="tlink"
+                    href={spotlight.data.links.live}
+                    target="_blank"
+                    rel="noopener"
+                  >
+                    Live app ↗
+                  </a>
+                )}
+                {spotlight.data.links.repo && (
+                  <a
+                    class="tlink"
+                    href={spotlight.data.links.repo}
+                    target="_blank"
+                    rel="noopener"
+                  >
+                    Public repo ↗
+                  </a>
+                )}
+                <a class="tlink" href={`/projects/${spotlight.id}`}>
+                  Case study →
+                </a>
+              </div>
+            </div>
+
+            <div class="spotlight-card">
+              <FoilAppraisalCard />
+            </div>
+          </div>
+        </div>
+      </section>
+    )
+  }
+
   {/* ======================== LANES ======================== */}
   <section class="section wrap">
     <hr class="rule" />
     <div class="label lanes-label" data-reveal>
       <span>Disciplines</span>
-      <span class="idx">02 / 02</span>
+      <span class="idx">03 / 03</span>
     </div>
     <h2 class="heading sec-head" data-reveal>
       Four lanes. One engineer.
@@ -167,6 +276,20 @@ const laneCount = (c: string) => all.filter((p) => p.data.category === c).length
   </section>
 </BaseLayout>
 
+<script>
+  // Pause the "messy" ember (sparks + glow flicker) when the hero scrolls out
+  // of view — no idle GPU/paint cost off-screen.
+  const heroEl = document.querySelector('.hero');
+  const emberEl = document.querySelector('.ember');
+  if (heroEl && emberEl) {
+    const io = new IntersectionObserver(
+      ([entry]) => emberEl.classList.toggle('ember-paused', !entry.isIntersecting),
+      { rootMargin: '0px' }
+    );
+    io.observe(heroEl);
+  }
+</script>
+
 <style>
   /* ---- hero ---- */
   .hero { padding-block: clamp(3.5rem, 9vh, 7rem) clamp(3rem, 6vh, 5rem); }
@@ -185,6 +308,16 @@ const laneCount = (c: string) => all.filter((p) => p.data.category === c).length
     margin-top: 1.6rem;
   }
   .display { margin-top: 1.5rem; }
+  .hero-note {
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    line-height: 1.6;
+    color: var(--text-faint);
+    max-width: 50ch;
+    margin-top: 1.5rem;
+    border-left: 2px solid var(--accent-line);
+    padding-left: 0.9rem;
+  }
   .hero-cta { display: flex; gap: 0.8rem; margin-top: 2.2rem; flex-wrap: wrap; }
 
   /* hero load animation */
@@ -194,12 +327,57 @@ const laneCount = (c: string) => all.filter((p) => p.data.category === c).length
     animation: rise 0.8s var(--ease) forwards;
     animation-delay: var(--d);
   }
+  /* hold the hero until the intro hands off, then let it rise into place */
+  :global(html.intro:not(.intro-go)) .h-anim { animation-play-state: paused; }
   @keyframes rise {
     to { opacity: 1; transform: none; }
   }
   @media (prefers-reduced-motion: reduce) {
     .h-anim { animation: none; opacity: 1; transform: none; }
   }
+
+  /* ---- "messy" — ember glow + drifting sparks ---- */
+  .ember {
+    position: relative;
+    display: inline-block;
+    color: var(--accent);
+    font-style: italic;
+    text-shadow: 0 0 7px rgba(240, 168, 48, 0.45), 0 0 18px rgba(235, 120, 35, 0.28);
+    animation: ember-flicker 3.2s ease-in-out infinite;
+  }
+  @keyframes ember-flicker {
+    0%, 100% { text-shadow: 0 0 7px rgba(240, 168, 48, 0.42), 0 0 18px rgba(235, 120, 35, 0.25); }
+    45% { text-shadow: 0 0 11px rgba(255, 185, 70, 0.6), 0 0 26px rgba(235, 120, 35, 0.4); }
+    72% { text-shadow: 0 0 8px rgba(240, 168, 48, 0.48), 0 0 20px rgba(235, 120, 35, 0.3); }
+  }
+
+  .ember-sparks {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+  .ember-sparks i {
+    position: absolute;
+    left: var(--x);
+    top: var(--y);
+    width: calc(0.09em * var(--s, 1));
+    height: calc(0.09em * var(--s, 1));
+    border-radius: 50%;
+    background: radial-gradient(circle, #ffe2a6 0%, var(--accent) 50%, rgba(235, 120, 35, 0) 72%);
+    box-shadow: 0 0 5px 1px rgba(240, 168, 48, 0.6);
+    opacity: 0;
+    animation: ember-drift 2.8s var(--d, 0s) ease-out infinite;
+  }
+  /* sparks radiate outward in all directions (per-spark --dx/--dy vector) */
+  @keyframes ember-drift {
+    0% { transform: translate(0, 0) scale(0.3); opacity: 0; }
+    18% { opacity: 1; }
+    70% { opacity: 0.7; }
+    100% { transform: translate(var(--dx, 0), var(--dy, 0)) scale(0.25); opacity: 0; }
+  }
+  /* pause the ember (glow flicker + sparks) when the hero is off-screen */
+  .ember-paused,
+  .ember-paused .ember-sparks i { animation-play-state: paused; }
 
   /* ---- instrument panel ---- */
   .panel {
@@ -277,13 +455,69 @@ const laneCount = (c: string) => all.filter((p) => p.data.category === c).length
   /* ---- section heads ---- */
   .sec-head { margin-top: 1.3rem; max-width: 18ch; }
 
-  /* ---- featured grid ---- */
-  .feature-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
+  /* ---- featured (asymmetric: full-width lead + two beneath) ---- */
+  .features {
+    display: flex;
+    flex-direction: column;
     gap: 1.25rem;
     margin-top: 2.8rem;
   }
+  .feature-rest {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+  }
+
+  /* ---- signature spotlight — the rhythm-breaking band ---- */
+  .spotlight-band {
+    position: relative;
+    z-index: 1;
+    background: var(--bg-elevated);
+    border-block: 1px solid var(--border);
+  }
+  .spotlight {
+    display: grid;
+    grid-template-columns: 1fr minmax(280px, 360px);
+    gap: clamp(2rem, 5vw, 4.5rem);
+    align-items: center;
+    margin-top: 2.6rem;
+  }
+  .spotlight-copy { display: flex; flex-direction: column; gap: 1.5rem; }
+  .spotlight-lede {
+    font-size: clamp(1.05rem, 1.6vw, 1.25rem);
+    line-height: 1.6;
+    color: var(--text-dim);
+    max-width: 52ch;
+  }
+  .spotlight-lede strong { color: var(--text); font-weight: 600; }
+  .spotlight-metrics {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.4rem 2.4rem;
+    list-style: none;
+    padding-block: 1.2rem;
+    border-block: 1px solid var(--border);
+  }
+  .spotlight-metrics li { display: flex; flex-direction: column; gap: 0.2rem; }
+  .spotlight-metrics .m-value {
+    font-size: 1.5rem;
+    color: var(--accent);
+    letter-spacing: -0.01em;
+  }
+  .spotlight-metrics .m-label {
+    font-size: 0.72rem;
+    color: var(--text-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .spotlight-caption {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    line-height: 1.7;
+    color: var(--text-faint);
+    max-width: 56ch;
+  }
+  .spotlight-links { display: flex; flex-wrap: wrap; gap: 1.4rem; }
   .all-link {
     display: inline-flex;
     align-items: center;
@@ -350,10 +584,13 @@ const laneCount = (c: string) => all.filter((p) => p.data.category === c).length
   @media (max-width: 940px) {
     .hero-grid { grid-template-columns: 1fr; }
     .panel { max-width: 420px; }
-    .feature-grid { grid-template-columns: 1fr; }
+    .feature-rest { grid-template-columns: 1fr; }
     .stats { grid-template-columns: repeat(2, 1fr); gap: 1.5rem 0; }
     .stats li:nth-child(3) { padding-left: 0; border-left: 0; }
     .lanes { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 860px) {
+    .spotlight { grid-template-columns: 1fr; }
   }
   @media (max-width: 480px) {
     .lanes { grid-template-columns: 1fr; }
