@@ -18,8 +18,8 @@ metrics:
     label: 'live panels'
   - value: '50k+'
     label: 'records / day'
-  - value: 'Code-gen'
-    label: 'reproducible build'
+  - value: 'As-code'
+    label: 'version-controlled dashboards'
 links: {}
 ---
 
