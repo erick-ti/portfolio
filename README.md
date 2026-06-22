@@ -12,7 +12,7 @@ need to be touched.
 - **Self-hosted fonts** via `@fontsource` (Instrument Serif for display, Hanken
   Grotesk for body text, IBM Plex Mono for the technical voice) and an
   `@astrojs/sitemap` integration
-- Static output, deployed on **Vercel**
+- Static output, hosted on **Cloudflare Pages**
 
 Requires Node 22.12+ (Astro 6 dropped Node 18 and 20).
 
@@ -64,4 +64,7 @@ the top of `src/styles/global.css`.
 ## Deploy
 
 Static output, so it can be hosted anywhere. This site builds with
-`npm run build` (output in `dist/`) and deploys automatically on push to Vercel.
+`npm run build` (output in `dist/`) and is served by Cloudflare Pages, which
+rebuilds and redeploys on every push to `main`. A `.node-version` file pins the
+build to Node 22, and `public/_headers` keeps `/resume.pdf` out of search
+indexes.
