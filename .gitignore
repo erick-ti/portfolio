@@ -25,5 +25,5 @@ yarn-error.log*
 !.vscode/extensions.json
 .idea/
 
-# local-only planning / strategy docs
+# local-only planning docs
 ROADMAP.md

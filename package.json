@@ -3,6 +3,13 @@
   "type": "module",
   "version": "1.1.0",
   "private": true,
+  "description": "Personal portfolio: engineering work and case studies.",
+  "author": "Erick Ti",
+  "license": "UNLICENSED",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/erick-ti/portfolio"
+  },
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
