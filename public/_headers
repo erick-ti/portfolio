@@ -1,0 +1,3 @@
+# Keep the resume out of search indexes on Cloudflare Pages.
+/resume.pdf
+  X-Robots-Tag: noindex
