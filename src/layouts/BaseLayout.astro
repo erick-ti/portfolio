@@ -15,8 +15,8 @@ interface Props {
 }
 
 const {
-  title = 'Erick Ti — Software Engineer',
-  description = 'Erick Ti builds production systems for the messy parts of the real world — AI assistants, data-heavy platforms, and internal products used where correctness matters.',
+  title = 'Erick Ti · Software Engineer',
+  description = 'Erick Ti builds production systems for the messy parts of the real world: AI assistants, data-heavy platforms, and internal products used where correctness matters.',
   image,
 } = Astro.props;
 
@@ -46,6 +46,8 @@ const ogImage = image ? new URL(image, Astro.site) : undefined;
       name="twitter:card"
       content={ogImage ? 'summary_large_image' : 'summary'}
     />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
     {ogImage && <meta name="twitter:image" content={ogImage} />}
 
     <meta name="theme-color" content="#0b0b0d" />
@@ -101,6 +103,53 @@ const ogImage = image ? new URL(image, Astro.site) : undefined;
         );
         items.forEach((el) => io.observe(el));
       }
+    </script>
+
+    <script>
+      // Count-up animation for headline stat values. Numeric values animate
+      // from 0 when scrolled into view; non-numeric ones (e.g. "Per-lot",
+      // "Audio-native") and before/after metrics ("11s → 0.5s") stay static.
+      // Skipped entirely under prefers-reduced-motion (final values shown).
+      (() => {
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        const parse = (txt) => {
+          if (txt.includes('→')) return null;
+          const m = txt.match(/^(\D*?)([\d][\d,]*\.?\d*)(.*)$/);
+          if (!m) return null;
+          const target = parseFloat(m[2].replace(/,/g, ''));
+          if (!isFinite(target)) return null;
+          const decimals = (m[2].split('.')[1] || '').length;
+          return { prefix: m[1], suffix: m[3], target, decimals, comma: m[2].includes(',') };
+        };
+        const fmt = (n, info) => {
+          const v = info.comma
+            ? n.toLocaleString('en-US', { minimumFractionDigits: info.decimals, maximumFractionDigits: info.decimals })
+            : n.toFixed(info.decimals);
+          return info.prefix + v + info.suffix;
+        };
+        const run = (el, info) => {
+          const dur = 1100, t0 = performance.now();
+          const ease = (t) => 1 - Math.pow(1 - t, 3);
+          const tick = (now) => {
+            const t = Math.min(1, (now - t0) / dur);
+            el.textContent = fmt(info.target * ease(t), info);
+            if (t < 1) requestAnimationFrame(tick);
+            else el.textContent = fmt(info.target, info);
+          };
+          requestAnimationFrame(tick);
+        };
+        const io = new IntersectionObserver((entries) => {
+          entries.forEach((e) => {
+            if (!e.isIntersecting) return;
+            const el = e.target, info = parse(el.textContent.trim());
+            if (info) { el.textContent = fmt(0, info); run(el, info); }
+            io.unobserve(el);
+          });
+        }, { threshold: 0.4 });
+        document.querySelectorAll('.s-value, .m-value, .lead-hero-value').forEach((el) => {
+          if (parse(el.textContent.trim())) io.observe(el);
+        });
+      })();
     </script>
   </body>
 </html>

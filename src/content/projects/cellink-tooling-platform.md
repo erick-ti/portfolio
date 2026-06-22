@@ -1,12 +1,13 @@
 ---
 title: 'CelLink Internal Tooling Platform'
-tagline: 'Fifteen-plus production internal tools — validation, reporting, and ETL — owned end to end across two manufacturing sites.'
+org: 'CelLink'
+tagline: 'Fifteen-plus production internal tools for validation, reporting, and ETL, owned end to end across two sites.'
 category: 'Product / Full-Stack'
 status: 'Shipped'
 visibility: 'private-production'
 featured: false
 order: 4
-timeframe: '2023 — Present'
+timeframe: '2024 to Present'
 role: 'Owning engineer'
 stack:
   - Python
@@ -18,54 +19,56 @@ stack:
 metrics:
   - value: '15+'
     label: 'production tools'
-  - value: '200+'
+  - value: '500+'
     label: 'users'
-  - value: '$12M+'
-    label: 'shipments validated'
+  - value: '99.9%'
+    label: 'uptime'
 links: {}
 ---
 
 ## Context
 
-A manufacturing startup scaling across two sites generates a constant
-need for software that the off-the-shelf market doesn't sell: end-of-line
-validation, quality reporting, data movement between systems that were
-never meant to talk. That whole surface became mine to own.
+A high-velocity startup scaling across two sites needs internal software the
+off-the-shelf market doesn't sell: data movement between systems that were never
+meant to talk, reporting, and validation. When that software is wrong,
+the cost lands immediately. That whole surface
+became mine to own.
 
 ## What I built
 
-A suite of 15+ internal tools serving 200+ users across the Bay Area and
-Texas sites — end-of-line validation systems, an admin tool, automated
-outgoing-quality-control reporting, and the ETL pipelines that feed them.
-Not one app: a platform of small, reliable tools, each solving a real
-operational bottleneck.
+A suite of 15+ internal tools serving 500+ users across both sites: validation
+systems, an admin tool, automated reporting, and the ETL pipelines that feed
+them. Not one
+app. A platform of small, focused tools, each one solving a real operational
+bottleneck, all maintained by one engineer.
 
 ## Architecture
 
-Services are built in Python/FastAPI and C#/.NET against SQL Server,
-with Apache NiFi handling data flow between systems and React powering
-the operator-facing interfaces. Each tool is small and focused, but they
-share conventions for data access, validation, and deployment so the
-whole set stays maintainable by one engineer.
+Services are Python/FastAPI and C#/.NET against SQL Server, with Apache NiFi
+moving data between systems and React on the operator-facing interfaces. Each
+tool stays small and single-purpose, but they share conventions for data access,
+validation, and deployment. That shared spine is what lets one person own 15+
+tools without the set rotting.
 
 ## Technical highlights
 
-- **End-of-line validation.** Systems that gate whether product
-  ships — correctness here has direct financial weight, behind the
-  $12M+ in validated shipments.
-- **OQC reporting automation.** Replaced a manual reporting process
-  with an automated pipeline, cutting report turnaround dramatically.
-- **Admin tooling.** Consolidated scattered manual operations into one
-  interface, with a large measured efficiency gain for the team.
+- **Validation that gates release.** These systems decide whether work passes, so
+  being down is not an option. They run at 99.9% uptime.
+- **Reporting automation.** Replaced a manual reporting process with an automated
+  pipeline, so the report is a byproduct of
+  the data instead of someone's afternoon.
+- **One admin surface.** Folded scattered manual operations into a single tool,
+  so day-to-day administration stops being tribal knowledge.
 
 ## Tradeoffs
 
-A platform of many small tools owned by one engineer demands ruthless
-consistency — shared patterns and conventions — or it becomes
-unmaintainable. That discipline is the cost of the breadth.
+Many small tools owned by one engineer only works under ruthless consistency.
+Every tool that drifts from the shared patterns is a tool only I can touch, and
+that doesn't scale. I'd rather give up a little local cleverness to keep the
+whole set legible. The discipline is the price of the breadth.
 
 ## Outcome
 
-The toolset is core operational infrastructure at both sites, used daily
-by 200+ people. It's also where I learned to ship software that an
-organization genuinely depends on.
+The toolset is core operational infrastructure at both sites, used daily by 500+
+people. It's also where I learned what it takes to ship software an organization
+genuinely leans on, and to keep it standing.

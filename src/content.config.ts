@@ -17,7 +17,7 @@ const projects = defineCollection({
   schema: z.object({
     // --- identity -----------------------------------------------------
     title: z.string(),
-    tagline: z.string(), // one recruiter-friendly sentence
+    tagline: z.string(), // one clear sentence
 
     // --- classification ----------------------------------------------
     // category drives the filter "lanes" on the Work page.
@@ -36,6 +36,7 @@ const projects = defineCollection({
     // --- context ------------------------------------------------------
     timeframe: z.string(), // e.g. "2024 — Present"
     role: z.string(), // e.g. "Sole engineer"
+    org: z.string().optional(), // employer for non-personal work, e.g. "CelLink"
     stack: z.array(z.string()),
 
     // --- quick-glance metrics (rendered as the stat row) -------------
@@ -83,6 +84,9 @@ const projects = defineCollection({
 
     // hide a project without deleting it
     draft: z.boolean().default(false),
+  }).refine((data) => !data.coverImage || Boolean(data.coverAlt), {
+    message: 'coverAlt is required when coverImage is set',
+    path: ['coverAlt'],
   }),
 });
 

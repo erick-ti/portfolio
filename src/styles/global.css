@@ -1,5 +1,5 @@
 /* =============================================================
-   ERICK TI — PORTFOLIO
+   ERICK TI · PORTFOLIO
    Design system: "developer instrument"
    Dark, precise, hairline-ruled. Editorial serif display paired
    with a technical monospace voice. One warm signal accent.
@@ -223,17 +223,17 @@ h2.heading {
 .status .dot {
   width: 7px; height: 7px; border-radius: 50%;
   background: var(--text-faint);
+  --dot-glow: var(--text-faint);
+  animation: dot-pulse 2.6s ease-in-out infinite;
 }
-.status[data-status='Shipped'] .dot { background: var(--signal-green); }
-.status[data-status='In Progress'] .dot {
-  background: var(--accent);
-  box-shadow: 0 0 0 0 var(--accent-line);
-  animation: pulse 2.4s infinite;
+.status[data-status='Shipped'] .dot { background: var(--signal-green); --dot-glow: var(--signal-green); }
+.status[data-status='In Progress'] .dot { background: var(--accent); --dot-glow: var(--accent); }
+@keyframes dot-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 transparent; opacity: 0.82; }
+  50%      { box-shadow: 0 0 7px 1px var(--dot-glow); opacity: 1; }
 }
-@keyframes pulse {
-  0%   { box-shadow: 0 0 0 0 var(--accent-line); }
-  70%  { box-shadow: 0 0 0 6px transparent; }
-  100% { box-shadow: 0 0 0 0 transparent; }
+@media (prefers-reduced-motion: reduce) {
+  .status .dot { animation: none; }
 }
 
 /* =============================================================
@@ -255,6 +255,7 @@ h2.heading {
    ============================================================= */
 .prose { max-width: 64ch; }
 .prose > * + * { margin-top: 1.15rem; }
+.prose > :first-child { margin-top: 0; }
 .prose h2 {
   font-family: var(--font-mono);
   font-size: 0.78rem;
