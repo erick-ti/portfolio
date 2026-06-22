@@ -44,6 +44,7 @@ const subMetrics = metrics.slice(1);
           <div class="card-top">
             <span class="num mono">{num}</span>
             <span class="card-top-meta">
+              {data.org && <span class="org-badge mono">{data.org}</span>}
               <span class:list={['vis', `vis--${vis.cls}`]}>{vis.label}</span>
               <span class="status" data-status={data.status}>
                 <span class="dot" />
@@ -90,6 +91,7 @@ const subMetrics = metrics.slice(1);
         <div class="card-top">
           <span class="num mono">{num}</span>
           <span class="card-top-meta">
+            {data.org && <span class="org-badge mono">{data.org}</span>}
             <span class:list={['vis', `vis--${vis.cls}`]}>{vis.label}</span>
             <span class="status" data-status={data.status}>
               <span class="dot" />
@@ -208,6 +210,17 @@ const subMetrics = metrics.slice(1);
     background: var(--accent-soft);
   }
   .vis--concept { color: var(--text-dim); }
+  .org-badge {
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.26rem 0.5rem;
+    background: var(--accent);
+    color: var(--bg);
+    font-weight: 600;
+    white-space: nowrap;
+  }
 
   .card-body { display: flex; flex-direction: column; gap: 0.6rem; }
   .cat {

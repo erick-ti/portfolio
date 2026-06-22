@@ -18,10 +18,10 @@ const lead = grid.find((p) => p.id === 'teams-ai-assistant') ?? grid[0] ?? null;
 const others = grid.filter((p) => p.id !== lead?.id);
 
 const stats = [
-  { value: '15+', label: 'production tools shipped' },
-  { value: '200+', label: 'internal users served' },
-  { value: '$12M+', label: 'shipments validated' },
-  { value: '2 sites', label: 'manufacturing footprint' },
+  { value: '15+', label: 'production systems' },
+  { value: '500+', label: 'users served' },
+  { value: '80%', label: 'fewer manual requests' },
+  { value: '22×', label: 'faster on a key query' },
 ];
 
 const lanes = [
@@ -53,7 +53,7 @@ const laneCount = (c: string) => all.filter((p) => p.data.category === c).length
     <div class="wrap hero-grid">
       <div class="hero-main">
         <p class="kicker h-anim" style="--d:0ms">
-          // software engineer — ai · data · product
+          // software engineer: ai · data · product
         </p>
         <h1 class="display h-anim" style="--d:90ms">
           I build production systems for the <span class="ember"
@@ -73,13 +73,13 @@ const laneCount = (c: string) => all.filter((p) => p.data.category === c).length
           > parts of the real world.
         </h1>
         <p class="hero-sub h-anim" style="--d:200ms">
-          AI assistants, data-heavy platforms, and internal products —
+          AI assistants, data-heavy platforms, and internal products,
           shipped where correctness, scale, and real users actually
           matter. Not toy projects.
         </p>
         <p class="hero-note h-anim" style="--d:300ms">
-          // the test I care about — does it survive real users, real money,
-          an actual factory floor?
+          // the test I care about: does it survive real users, real money,
+          real production at scale?
         </p>
         <div class="hero-cta h-anim" style="--d:400ms">
           <a href="/projects" class="btn btn--solid">
@@ -177,7 +177,7 @@ const laneCount = (c: string) => all.filter((p) => p.data.category === c).length
             <div class="spotlight-copy">
               <p class="spotlight-lede">
                 <strong>{spotlight.data.title}</strong> is a full-stack
-                valuation system for a trading-card collection — Django/DRF
+                valuation system for a trading-card collection, built with Django/DRF
                 and Next.js, tracking per-lot cost basis, market movement, and
                 catalog-match confidence. The card beside this is one
                 holding&rsquo;s appraisal readout.
@@ -196,7 +196,7 @@ const laneCount = (c: string) => all.filter((p) => p.data.category === c).length
 
               <p class="spotlight-caption">
                 Illustrative readout modeled on Millennium&rsquo;s lot-cost
-                valuation pipeline — per-lot cost basis, append-only daily
+                valuation pipeline: per-lot cost basis, append-only daily
                 snapshots, and confidence-scored catalog matching. Values are
                 illustrative.
               </p>
@@ -249,7 +249,7 @@ const laneCount = (c: string) => all.filter((p) => p.data.category === c).length
     </h2>
     <p class="lanes-intro" data-reveal>
       The work spans a few distinct disciplines. Filter the project
-      index by whichever one matches the role you&rsquo;re hiring for.
+      index by whichever one you want to dig into.
     </p>
 
     <div class="lanes">
@@ -422,7 +422,14 @@ const laneCount = (c: string) => all.filter((p) => p.data.category === c).length
     border-radius: 50%;
     background: var(--signal-green);
     margin-right: 0.45rem;
-    box-shadow: 0 0 8px var(--signal-green);
+    animation: live-pulse 2.4s ease-in-out infinite;
+  }
+  @keyframes live-pulse {
+    0%, 100% { box-shadow: 0 0 4px 0 var(--signal-green); opacity: 0.85; }
+    50%      { box-shadow: 0 0 11px 2px var(--signal-green); opacity: 1; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .live { animation: none; box-shadow: 0 0 8px var(--signal-green); }
   }
 
   /* ---- stats ---- */

@@ -38,7 +38,7 @@ const isMillennium = project.id === 'millennium';
 ---
 
 <BaseLayout
-  title={`${data.title} — Erick Ti`}
+  title={`${data.title} · Erick Ti`}
   description={data.tagline}
   image={data.ogImage}
 >
@@ -61,6 +61,18 @@ const isMillennium = project.id === 'millennium';
       </div>
       <h1 class="display ptitle" data-reveal>{data.title}</h1>
       <p class="tagline" data-reveal>{data.tagline}</p>
+      {
+        linkEntries.length > 0 && (
+          <div class="head-links" data-reveal>
+            {linkEntries.map(([k, v]) => (
+              <a href={v} class="head-link" target="_blank" rel="noopener">
+                {linkLabels[k] ?? k}
+                <span class="arr">↗</span>
+              </a>
+            ))}
+          </div>
+        )
+      }
     </header>
 
     {/* ---- hero: cover image, or the live foil artifact for Millennium ---- */}
@@ -71,7 +83,7 @@ const isMillennium = project.id === 'millennium';
             <FoilAppraisalCard />
             <figcaption class="foil-hero-cap mono">
               Illustrative readout from Millennium&rsquo;s lot-cost valuation
-              pipeline — per-lot cost basis, append-only daily snapshots, and
+              pipeline: per-lot cost basis, append-only daily snapshots, and
               confidence-scored catalog matching. Values are illustrative.
             </figcaption>
           </figure>
@@ -103,66 +115,55 @@ const isMillennium = project.id === 'millennium';
       )
     }
 
-    {/* ---- meta panel ---- */}
-    <div class="wrap">
-      <dl class="meta" data-reveal>
-        <div class="meta-item">
-          <dt>Timeframe</dt>
-          <dd>{data.timeframe}</dd>
-        </div>
-        <div class="meta-item">
-          <dt>Role</dt>
-          <dd>{data.role}</dd>
-        </div>
-        <div class="meta-item meta-stack">
-          <dt>Stack</dt>
-          <dd>
-            <ul class="stack">
-              {data.stack.map((t) => <li class="tag">{t}</li>)}
-            </ul>
-          </dd>
-        </div>
-        <div class="meta-item">
-          <dt>Links</dt>
-          <dd>
-            {
-              linkEntries.length > 0 ? (
-                <ul class="links">
-                  {linkEntries.map(([k, v]) => (
-                    <li>
-                      <a
-                        href={v}
-                        class="tlink"
-                        target="_blank"
-                        rel="noopener"
-                      >
-                        {linkLabels[k] ?? k} ↗
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <span class="no-link mono">Internal — case study only</span>
-              )
-            }
-          </dd>
-        </div>
-      </dl>
-    </div>
-
-    {/* ---- body ---- */}
-    <div class="wrap body" data-reveal>
-      <div class="prose">
+    {/* ---- body + sticky instrument rail ---- */}
+    <div class="wrap layout">
+      <div class="prose body" data-reveal>
         <Content />
       </div>
+
+      <aside class="rail" data-reveal>
+        {
+          linkEntries.length > 0 ? (
+            <div class="rail-links">
+              {linkEntries.map(([k, v]) => (
+                <a href={v} class="rail-btn" target="_blank" rel="noopener">
+                  {linkLabels[k] ?? k}
+                  <span class="arr">↗</span>
+                </a>
+              ))}
+            </div>
+          ) : (
+            <p class="rail-nolink mono">Internal · case study only</p>
+          )
+        }
+        <dl class="rail-facts">
+          <div><dt>Timeframe</dt><dd>{data.timeframe}</dd></div>
+          <div><dt>Role</dt><dd>{data.role}</dd></div>
+          <div><dt>Context</dt><dd>{data.org ?? 'Personal project'}</dd></div>
+          <div class="rail-stack">
+            <dt>Stack</dt>
+            <dd>
+              <ul class="stack">
+                {data.stack.map((t) => <li class="tag">{t}</li>)}
+              </ul>
+            </dd>
+          </div>
+        </dl>
+      </aside>
     </div>
 
-    {/* ---- screenshots ---- */}
+    {/* ---- the live product / screenshots ---- */}
     {
-      data.screenshots.length > 0 && (
+      (data.screenshots.length > 0 || (isMillennium && data.coverImage)) && (
         <div class="wrap shots">
-          <p class="kicker" data-reveal>// screens</p>
+          <p class="kicker" data-reveal>// the product</p>
           <div class="shot-grid">
+            {isMillennium && data.coverImage && (
+              <figure class="shot shot--wide" data-reveal>
+                <img src={data.coverImage} alt={data.coverAlt ?? data.title} loading="lazy" />
+                <figcaption>The live Vault: a trading-card collection appraised like a financial portfolio.</figcaption>
+              </figure>
+            )}
             {data.screenshots.map((s) => (
               <figure class="shot" data-reveal>
                 <img src={s.src} alt={s.alt} loading="lazy" />
@@ -265,6 +266,7 @@ const isMillennium = project.id === 'millennium';
     background: var(--bg-elevated);
   }
   .shot img { width: 100%; display: block; }
+  .shot--wide { grid-column: 1 / -1; }
   .shot figcaption {
     font-family: var(--font-mono);
     font-size: 0.74rem;
@@ -287,36 +289,93 @@ const isMillennium = project.id === 'millennium';
     max-width: 56ch;
     margin-top: 1.5rem;
   }
+  .head-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.7rem;
+    margin-top: 1.6rem;
+  }
+  .head-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 0.6rem 1.05rem;
+    border: 1px solid var(--accent-line);
+    color: var(--accent);
+    background: var(--accent-soft);
+    transition: background 0.2s var(--ease), color 0.2s var(--ease);
+  }
+  .head-link:hover { background: var(--accent); color: var(--bg); }
+  .head-link .arr { transition: transform 0.2s var(--ease); }
+  .head-link:hover .arr { transform: translate(2px, -2px); }
 
-  /* ---- meta ---- */
-  .meta {
+  /* ---- body + sticky instrument rail ---- */
+  .layout {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: minmax(0, 1fr) 17rem;
+    gap: clamp(2rem, 5vw, 4.5rem);
+    align-items: start;
+    padding-block: 3rem 4rem;
+  }
+  .layout .body { padding-block: 0; }
+  .rail {
+    position: sticky;
+    top: 88px;
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+  }
+  .rail-links { display: flex; flex-direction: column; gap: 0.55rem; }
+  .rail-btn {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 0.78rem 0.95rem;
+    border: 1px solid var(--accent-line);
+    color: var(--accent);
+    background: var(--accent-soft);
+    transition: background 0.2s var(--ease), color 0.2s var(--ease);
+  }
+  .rail-btn:hover { background: var(--accent); color: var(--bg); }
+  .rail-btn .arr { transition: transform 0.2s var(--ease); }
+  .rail-btn:hover .arr { transform: translate(2px, -2px); }
+  .rail-nolink {
+    font-size: 0.76rem;
+    color: var(--text-faint);
+    border: 1px dashed var(--border);
+    padding: 0.7rem 0.85rem;
+  }
+  .rail-facts {
     border: 1px solid var(--border);
     background: var(--bg-elevated);
   }
-  .meta-item {
-    padding: 1.1rem 1.25rem;
-    border-right: 1px solid var(--border);
+  .rail-facts > div {
+    padding: 0.8rem 1rem;
+    border-bottom: 1px solid var(--border);
   }
-  .meta-item:last-child { border-right: 0; }
-  .meta-stack { grid-column: span 1; }
-  .meta dt {
+  .rail-facts > div:last-child { border-bottom: 0; }
+  .rail-facts dt {
     font-family: var(--font-mono);
-    font-size: 0.66rem;
+    font-size: 0.63rem;
     letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--text-faint);
-    margin-bottom: 0.55rem;
+    margin-bottom: 0.45rem;
   }
-  .meta dd {
+  .rail-facts dd {
     font-family: var(--font-mono);
-    font-size: 0.84rem;
+    font-size: 0.82rem;
     color: var(--text);
   }
   .stack { display: flex; flex-wrap: wrap; gap: 0.35rem; list-style: none; }
-  .links { list-style: none; display: flex; flex-direction: column; gap: 0.4rem; }
-  .no-link { font-size: 0.78rem; color: var(--text-faint); }
 
   /* ---- metrics ---- */
   .metrics {
@@ -370,17 +429,11 @@ const isMillennium = project.id === 'millennium';
     color: var(--text-dim);
   }
 
-  @media (max-width: 760px) {
-    .meta { grid-template-columns: 1fr 1fr; }
-    .meta-item:nth-child(2) { border-right: 0; }
-    .meta-item:nth-child(1), .meta-item:nth-child(2) {
-      border-bottom: 1px solid var(--border);
-    }
-    .metrics { gap: 1.5rem 2rem; }
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; }
+    .rail { position: static; order: -1; }
   }
-  @media (max-width: 460px) {
-    .meta { grid-template-columns: 1fr; }
-    .meta-item { border-right: 0; border-bottom: 1px solid var(--border); }
-    .meta-item:last-child { border-bottom: 0; }
+  @media (max-width: 760px) {
+    .metrics { gap: 1.5rem 2rem; }
   }
 </style>
