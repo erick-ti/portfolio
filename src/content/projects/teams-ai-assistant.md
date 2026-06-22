@@ -1,13 +1,14 @@
 ---
-title: 'OTIS — Teams AI Assistant'
+title: 'OTIS: Teams AI Assistant'
+org: 'CelLink'
 tagline: 'A natural-language interface that lets non-technical staff query production databases and locate documents without leaving Microsoft Teams.'
 category: 'AI Systems'
 status: 'Shipped'
 visibility: 'private-production'
 featured: true
 order: 1
-timeframe: '2024 — Present'
-role: 'Sole engineer — concept to production'
+timeframe: '2024 to Present'
+role: 'Two-engineer build'
 stack:
   - Python
   - FastAPI
@@ -16,9 +17,9 @@ stack:
   - SQL Server
   - Azure
 metrics:
-  - value: '~80%'
+  - value: '80%'
     label: 'fewer ad-hoc data requests'
-  - value: '50+'
+  - value: '500+'
     label: 'staff served'
   - value: '~$115/mo'
     label: 'runtime cost'
@@ -27,51 +28,55 @@ links: {}
 
 ## Context
 
-Manufacturing teams leaned on engineering for routine answers — yields,
-test results, the location of a spec document. Every request became an
-ad-hoc ticket, and the cumulative interrupt tax on the engineering team
-was real. The information existed; the access path didn't.
+The information always existed: yields, test results, where a given spec
+lived. The access path didn't. Anyone who wasn't fluent in SQL
+had exactly one way to get an answer out of production: file a ticket and wait
+on an engineer. Every routine question turned into an interrupt, and the
+cumulative tax on the engineering team was real. A steady drip of "quick
+questions" pulled people off the work they were actually there to do.
 
 ## What I built
 
-OTIS is a Teams-native assistant that takes plain-English questions and
-returns answers in-channel. Ask it for a yield trend or a document, and
-it figures out which tool to call, runs it, and replies — no SQL, no
-shared-drive spelunking required. It was built solo from concept to a
-production rollout for 50+ users.
+OTIS is a Teams-native assistant that answers plain-English questions in the
+channel where people already work. Ask it for a yield trend or a document, and
+it works out which tool to call, runs it, and replies. No SQL, no digging
+through the shared drive. Another engineer and I built it from concept to production, and it now
+serves 500+ users.
 
 ## Architecture
 
-A FastAPI service mediates between Teams and the Anthropic API. User
-messages are passed to the model with a custom tool-calling layer that
-exposes two capabilities: a parameterized SQL query tool scoped to
-read-only reporting views, and a file-retrieval tool over the shared
-drive. The model plans which tools to invoke; the service executes them
-under tightly controlled permissions and returns structured results for
-the model to summarize.
-
-When the Bot Framework Python SDK was deprecated, the Teams integration
-was migrated onto the M365 Agents SDK without downtime to users.
+A FastAPI service sits between Teams and the Anthropic API. Each incoming
+message goes to the model alongside a custom tool-calling layer that exposes
+exactly two capabilities: a parameterized SQL tool scoped to read-only
+reporting views, and a file-retrieval tool over the shared drive. The model
+decides which tool to call; the service executes it under tight permissions and
+returns structured results for the model to summarize. The model plans. It
+never gets a hand on the database itself.
 
 ## Technical highlights
 
-- **Constrained tool surface.** The SQL tool never runs free-form
-  queries — it targets a fixed set of vetted views with bound
-  parameters, so a creative prompt can't reach data it shouldn't.
-- **Cost discipline.** Prompt design and model selection keep the whole
-  system running at roughly $115/month while serving the full team.
-- **Graceful SDK migration.** Swapping the deprecated framework was
-  scoped as an isolated adapter change rather than a rewrite.
+- **A deliberately small tool surface.** The SQL tool never runs free-form
+  queries. It hits a fixed set of vetted views with bound parameters, so no
+  amount of clever prompting reaches data it shouldn't. For a model pointed at
+  production, that constraint *is* the feature.
+- **Cost discipline.** Careful prompt design and model selection keep the whole
+  thing running around $115/month while serving the full team, cheap enough
+  that nobody has to think about it.
+- **A migration nobody noticed.** When the Bot Framework Python SDK was
+  deprecated, I moved the Teams integration onto the M365 Agents SDK as an
+  isolated adapter swap rather than a rewrite. No downtime for users.
 
 ## Tradeoffs
 
-The constrained tool surface deliberately trades flexibility for safety:
-new questions sometimes need a new view rather than working
-out-of-the-box. For an internal tool touching production data, that's
-the right side of the line.
+The small tool surface trades flexibility for safety on purpose: a genuinely
+new question sometimes needs a new vetted view before OTIS can answer it,
+instead of working out of the box. For a tool touching production data, I'll
+take that trade every time. I'd rather add a reviewed view than hand a model a
+blank check.
 
 ## Outcome
 
-Ad-hoc data requests to engineering dropped roughly 80%. The system runs
-quietly in production and has become the default way non-technical staff
-get to the data they need.
+Ad-hoc data requests to engineering dropped about 80%. OTIS runs quietly in
+production and has become the default way non-technical staff get to their
+data. That's the only outcome I really cared about: people reach for it without
+being told to.
