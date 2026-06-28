@@ -1,0 +1,180 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+// Recovery routes, ordered by how useful they are to someone who hit a dead
+// link: home first, then straight into the work.
+const exits = [
+  { href: '/', label: 'Back to home', solid: true },
+  { href: '/projects', label: 'See the work', solid: false },
+];
+---
+
+<BaseLayout
+  title="404 · Page not found · Erick Ti"
+  description="The page you requested could not be found. Head back to the homepage or jump straight to the selected work."
+>
+  <section class="wrap nf">
+    <div class="nf-grid">
+      {/* ---- main column ---- */}
+      <div class="nf-main">
+        <p class="kicker r" style="--d:0ms">// error 404 · route not found</p>
+        <h1 class="display r" style="--d:90ms">
+          This route doesn&rsquo;t <span class="accent">resolve</span>.
+        </h1>
+        <p class="nf-sub r" style="--d:180ms">
+          The page you requested moved, or the link was mistyped. The rest of
+          the site is very much alive.
+        </p>
+        <div class="nf-cta r" style="--d:280ms">
+          {
+            exits.map((e) => (
+              <a href={e.href} class={`btn${e.solid ? ' btn--solid' : ''}`}>
+                {e.label} <span class="arr">&rarr;</span>
+              </a>
+            ))
+          }
+        </div>
+      </div>
+
+      {/* ---- diagnostic readout ---- */}
+      <aside class="diag r" style="--d:240ms" aria-label="Diagnostic">
+        <div class="diag-row">
+          <span class="d-key">status</span>
+          <span class="d-val accent">404</span>
+        </div>
+        <div class="diag-row">
+          <span class="d-key">meaning</span>
+          <span class="d-val">not found</span>
+        </div>
+        <div class="diag-row">
+          <span class="d-key">req.path</span>
+          <span class="d-val mono" id="req-path">&hellip;</span>
+        </div>
+        <div class="diag-row">
+          <span class="d-key">signal</span>
+          <span class="d-val">
+            <span class="lost" aria-hidden="true"></span>route unmapped
+          </span>
+        </div>
+      </aside>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  // Report the path that failed to resolve, a small on-brand instrument
+  // touch. textContent only (never innerHTML), so the reflected URL can't
+  // inject markup. Capped so a long path can't blow out the panel.
+  const el = document.getElementById('req-path');
+  if (el) {
+    let p = location.pathname + location.search;
+    if (p.length > 42) p = p.slice(0, 41) + '…';
+    el.textContent = p;
+  }
+</script>
+
+<style>
+  .nf {
+    min-height: clamp(60vh, 70vh, 80vh);
+    display: flex;
+    align-items: center;
+    padding-block: clamp(3rem, 9vh, 6rem);
+  }
+  .nf-grid {
+    display: grid;
+    grid-template-columns: 1.5fr minmax(240px, 0.85fr);
+    gap: clamp(2rem, 5vw, 4.5rem);
+    align-items: center;
+    width: 100%;
+  }
+
+  .nf-main { min-width: 0; }
+  .display { margin-top: 1.4rem; max-width: 14ch; }
+  .nf-sub {
+    font-family: var(--font-mono);
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: var(--text-dim);
+    max-width: 44ch;
+    margin-top: 1.6rem;
+  }
+  .nf-cta { display: flex; gap: 0.8rem; margin-top: 2.2rem; flex-wrap: wrap; }
+
+  /* ---- diagnostic panel (mirrors the homepage SYS.STATUS instrument) ---- */
+  .diag {
+    border: 1px solid var(--border);
+    background: var(--bg-elevated);
+    padding: 0.4rem 0;
+    position: relative;
+  }
+  .diag::before {
+    content: 'TRACE';
+    position: absolute;
+    top: -0.62rem;
+    left: 1rem;
+    background: var(--bg);
+    padding: 0 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.16em;
+    color: var(--text-faint);
+  }
+  .diag-row {
+    display: flex;
+    gap: 1rem;
+    padding: 0.62rem 1.1rem;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .diag-row:last-child { border-bottom: 0; }
+  .d-key {
+    /* --text-dim (not --text-faint) so the keys clear WCAG AA on the panel's
+       --bg-elevated background (~6.65:1); --text-faint dips to ~4.43:1 there. */
+    color: var(--text-dim);
+    width: 4.6rem;
+    flex: none;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    align-self: center;
+  }
+  .d-val {
+    color: var(--text);
+    min-width: 0;
+    overflow-wrap: anywhere;
+    display: flex;
+    align-items: center;
+  }
+  .d-val.accent { color: var(--accent); }
+  /* dim, non-pulsing "no signal" indicator: neutral, not the green "live" dot */
+  .lost {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--text-faint);
+    margin-right: 0.5rem;
+    flex: none;
+  }
+
+  /* ---- CSS-only staggered rise: base is hidden, animation reveals it, and
+         reduced-motion shows everything immediately. No JS dependency, so the
+         page never renders blank even if the script fails. ---- */
+  .r {
+    opacity: 0;
+    transform: translateY(16px);
+    animation: nf-rise 0.8s var(--ease) forwards;
+    animation-delay: var(--d, 0ms);
+  }
+  @keyframes nf-rise {
+    to { opacity: 1; transform: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .r { animation: none; opacity: 1; transform: none; }
+  }
+
+  @media (max-width: 860px) {
+    .nf { min-height: 0; }
+    .nf-grid { grid-template-columns: 1fr; gap: 2.4rem; }
+    .diag { max-width: 420px; }
+    .display { max-width: 18ch; }
+  }
+</style>
