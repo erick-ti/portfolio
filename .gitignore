@@ -25,5 +25,6 @@ yarn-error.log*
 !.vscode/extensions.json
 .idea/
 
-# local-only planning docs
+# local-only planning + ops docs
 ROADMAP.md
+DEPLOY_RUNBOOK.md
