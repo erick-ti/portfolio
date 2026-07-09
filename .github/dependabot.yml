@@ -1,9 +1,32 @@
+# Dependabot version updates. Security updates run separately (no config
+# needed) and bypass cooldown, since they fix known vulnerabilities.
+# cooldown holds each version update until the release is 7 days old, past
+# the window where most malicious or broken releases get caught and yanked.
+#
+# The groups deliberately take every semver level, majors included: this is
+# a static site where the build workflow catches a breaking bump, and fewer
+# PRs beats per-major ceremony. (update-types filtering on wildcard groups
+# has open misbehavior reports, dependabot-core#14202, so this repo keeps
+# the simpler all-semver group.)
 version: 2
 updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
+    cooldown:
+      default-days: 7
     groups:
       actions:
+        patterns: ["*"]
+
+  # Site dependencies (astro and its integrations).
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    cooldown:
+      default-days: 7
+    groups:
+      npm:
         patterns: ["*"]
