@@ -1,7 +1,16 @@
 name: gitleaks
 
+# push only on main: an unscoped push trigger fired a duplicate run on every
+# PR, and the pull_request run already scans the branch's whole commit range
+# (baseRef^..headRef), so scoping it loses no pre-merge coverage.
+#
+# Scanning branch pushes here would not prevent a leak in any case: the job
+# starts after GitHub has accepted the objects, and on a public repo that
+# acceptance is the exposure. Push protection is what rejects a secret at
+# push time. This workflow is the gate on what reaches main.
 on:
   push:
+    branches: [main]
   pull_request:
   workflow_dispatch:  # allow manual runs from the Actions tab
 

@@ -1,0 +1,39 @@
+name: build
+
+# Guards what the secret scan cannot: that the site still compiles. astro
+# build also validates the content collection schema, so a malformed project
+# .md fails here instead of on Cloudflare Pages after the merge.
+#
+# No paths filter, on purpose. A required check that skips on some PRs never
+# reports a conclusion, and those PRs sit blocked forever. That is exactly
+# what happened to CodeQL on workflow-only dependabot PRs, and why it is no
+# longer a required check.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:  # allow manual runs from the Actions tab
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: build site
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v7
+
+      - name: set up node
+        uses: actions/setup-node@v6
+        with:
+          # the same pin Cloudflare Pages reads, so CI and production agree
+          node-version-file: .node-version
+          cache: npm
+
+      - name: install
+        run: npm ci
+
+      - name: build
+        run: npm run build
