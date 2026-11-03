@@ -18,9 +18,9 @@ const lead = grid.find((p) => p.id === 'teams-ai-assistant') ?? grid[0] ?? null;
 const others = grid.filter((p) => p.id !== lead?.id);
 
 const stats = [
-  { value: '15+', label: 'production systems' },
+  { value: '10+', label: 'production systems' },
   { value: '500+', label: 'users served' },
-  { value: '80%', label: 'fewer manual requests' },
+  { value: '70%', label: 'less manual data entry' },
   { value: '22×', label: 'faster on a key query' },
 ];
 
@@ -74,12 +74,7 @@ const laneCount = (c: string) => all.filter((p) => p.data.category === c).length
         </h1>
         <p class="hero-sub h-anim" style="--d:200ms">
           AI assistants, data-heavy platforms, and internal products,
-          shipped where correctness, scale, and real users actually
-          matter. Not toy projects.
-        </p>
-        <p class="hero-note h-anim" style="--d:300ms">
-          // the test I care about: does it survive real users, real money,
-          real production at scale?
+          shipped where correctness, scale, and real users matter.
         </p>
         <div class="hero-cta h-anim" style="--d:400ms">
           <a href="/projects" class="btn btn--solid">
@@ -308,16 +303,6 @@ const laneCount = (c: string) => all.filter((p) => p.data.category === c).length
     margin-top: 1.6rem;
   }
   .display { margin-top: 1.5rem; }
-  .hero-note {
-    font-family: var(--font-mono);
-    font-size: 0.82rem;
-    line-height: 1.6;
-    color: var(--text-faint);
-    max-width: 50ch;
-    margin-top: 1.5rem;
-    border-left: 2px solid var(--accent-line);
-    padding-left: 0.9rem;
-  }
   .hero-cta { display: flex; gap: 0.8rem; margin-top: 2.2rem; flex-wrap: wrap; }
 
   /* hero load animation */
