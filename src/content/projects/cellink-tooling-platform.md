@@ -1,7 +1,7 @@
 ---
 title: 'CelLink Internal Tooling Platform'
 org: 'CelLink'
-tagline: 'Fifteen-plus production internal tools for validation, reporting, and ETL, owned end to end across two sites.'
+tagline: 'Ten-plus production internal tools for validation, reporting, and ETL, owned end to end across two sites.'
 category: 'Product / Full-Stack'
 status: 'Shipped'
 visibility: 'private-production'
@@ -17,7 +17,7 @@ stack:
   - Apache NiFi
   - React
 metrics:
-  - value: '15+'
+  - value: '10+'
     label: 'production tools'
   - value: '500+'
     label: 'users'
@@ -36,7 +36,7 @@ became mine to own.
 
 ## What I built
 
-A suite of 15+ internal tools serving 500+ users across both sites: validation
+A suite of 10+ internal tools serving 500+ users across both sites: validation
 systems, an admin tool, automated reporting, and the ETL pipelines that feed
 them. Not one
 app. A platform of small, focused tools, each one solving a real operational
@@ -47,7 +47,7 @@ bottleneck, all maintained by one engineer.
 Services are Python/FastAPI and C#/.NET against SQL Server, with Apache NiFi
 moving data between systems and React on the operator-facing interfaces. Each
 tool stays small and single-purpose, but they share conventions for data access,
-validation, and deployment. That shared spine is what lets one person own 15+
+validation, and deployment. That shared spine is what lets one person own 10+
 tools without the set rotting.
 
 ## Technical highlights

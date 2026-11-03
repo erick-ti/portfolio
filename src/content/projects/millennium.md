@@ -28,7 +28,7 @@ metrics:
     label: 'Django apps'
   - value: '14'
     label: 'typed React screens'
-  - value: '821'
+  - value: '873'
     label: 'automated tests'
   - value: '43,313'
     label: 'card printings'
@@ -84,7 +84,7 @@ loss.
   versus review tiers. A weak match lands in review instead of silently becoming a
   holding, because a fuzzy match that turns into money is worse than no match at
   all.
-- **821 automated tests.** Valuation math breaks in ways nobody notices until the
+- **873 automated tests.** Valuation math breaks in ways nobody notices until the
   number is wrong. The pytest, Vitest, and Playwright suite is the safety net that
   lets me refactor the money path without holding my breath.
 - **Off-box backups, pull-based deploys.** Backups go to R2 on a schedule and the
@@ -94,7 +94,7 @@ loss.
 
 ## Tradeoffs
 
-Self-hosting on a VPS, fully containerized and fully typed, with 821 tests, is
+Self-hosting on a VPS, fully containerized and fully typed, with 873 tests, is
 heavier than a personal project strictly needs. That is the point. Millennium is
 built to survive production, because demonstrating that I can run something in
 production is half of what it is for. The cost is real maintenance: I own the box,

@@ -1,7 +1,7 @@
 ---
 title: 'Real-Time Telemetry Platform'
 org: 'CelLink'
-tagline: 'Real-time telemetry at scale: 20+ event-driven ETL pipelines feeding 30+ code-generated dashboards, on a Kubernetes cluster built to stay up.'
+tagline: 'Real-time telemetry at scale: 7+ event-driven ETL pipelines feeding 30+ code-generated dashboards, on a Kubernetes cluster built to stay up.'
 category: 'Data & Operations'
 status: 'Shipped'
 visibility: 'private-production'
@@ -20,7 +20,7 @@ stack:
 metrics:
   - value: '30+'
     label: 'live dashboards'
-  - value: '20+'
+  - value: '7+'
     label: 'ETL pipelines'
   - value: '50k+'
     label: 'records / day'
@@ -38,7 +38,7 @@ reliably, and the dashboards have to stay honest.
 
 ## What I built
 
-A real-time telemetry backbone: 20+ event-driven ETL pipelines that move
+A real-time telemetry backbone: 7+ event-driven ETL pipelines that move
 equipment data off the line into a time-series store, feeding 30+ Grafana
 dashboards that operators and process engineers watch in real time. The pipelines
 are C# file-watcher services. The dashboards are generated from code, not clicked
@@ -76,13 +76,13 @@ load.
 Generating dashboards from code and running the pipelines on Kubernetes is more
 upfront machinery than a handful of charts would need. You can't just drag a panel
 and save, and a cluster is a thing you have to operate. It pays back the moment you
-have 30+ dashboards that must agree, 20+ pipelines that can't silently die, and an
+have 30+ dashboards that must agree, 7+ pipelines that can't silently die, and an
 operation that treats the data as ground truth.
 
 ## Outcome
 
 The platform runs as live, real-time monitoring across the operation: equipment telemetry
-flows through 20+ pipelines into 30+ dashboards that operators and engineers trust
+flows through 7+ pipelines into 30+ dashboards that operators and engineers trust
 as a shared, real-time view of process health. It runs on infrastructure built to
 survive a bad night, and every dashboard lives in version control where it can be
 reviewed and rebuilt instead of redrawn by hand.
