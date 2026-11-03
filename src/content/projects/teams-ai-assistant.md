@@ -1,82 +1,74 @@
 ---
-title: 'OTIS: Teams AI Assistant'
+title: 'OTIS: Company-Wide AI Agent'
 org: 'CelLink'
-tagline: 'A natural-language interface that lets non-technical staff query production databases and locate documents without leaving Microsoft Teams.'
+tagline: 'An AI agent on the web and in Microsoft Teams that lets anyone at the company query live business data and search internal docs in plain English.'
 category: 'AI Systems'
 status: 'Shipped'
 visibility: 'private-production'
 featured: true
 order: 1
 timeframe: '2024 to Present'
-role: 'Two-engineer build'
+role: 'Engineer'
 stack:
-  - Python
-  - FastAPI
+  - React
+  - TypeScript
+  - .NET 10
   - Anthropic SDK
-  - M365 Agents SDK
+  - Qdrant
   - SQL Server
-  - Azure
 metrics:
-  - value: '80%'
-    label: 'fewer ad-hoc data requests'
-  - value: '500+'
-    label: 'staff served'
-  - value: '~$115/mo'
-    label: 'runtime cost'
+  - value: '20%'
+    label: 'fewer recurring support requests'
+  - value: 'All staff'
+    label: 'company-wide rollout'
+  - value: 'Web + Teams'
+    label: 'where it runs'
 links: {}
 ---
 
 ## Context
 
-The information always existed: yields, test results, where a given spec
-lived. The access path didn't. Anyone who wasn't fluent in SQL
-had exactly one way to get an answer out of production: file a ticket and wait
-on an engineer. Every routine question turned into an interrupt, and the
-cumulative tax on the engineering team was real. A steady drip of "quick
-questions" pulled people off the work they were actually there to do.
+The business data and internal docs already existed. Getting to them often
+meant knowing SQL or knowing where a document was filed, and the fallback was
+asking the software team. Those recurring support requests were the cost I
+wanted to cut.
 
 ## What I built
 
-OTIS is a Teams-native assistant that answers plain-English questions in the
-channel where people already work. Ask it for a yield trend or a document, and
-it works out which tool to call, runs it, and replies. No SQL, no digging
-through the shared drive. Another engineer and I built it from concept to production, and it now
-serves 500+ users.
+OTIS is a company-wide AI agent that answers plain-English questions on the web
+and inside Microsoft Teams, where people already work. Ask it about live business
+data or an internal doc, and it works out which tool to call, runs it, checks its
+own answer, and replies. It is used by all staff.
 
 ## Architecture
 
-A FastAPI service sits between Teams and the Anthropic API. Each incoming
-message goes to the model alongside a custom tool-calling layer that exposes
-exactly two capabilities: a parameterized SQL tool scoped to read-only
-reporting views, and a file-retrieval tool over the shared drive. The model
-decides which tool to call; the service executes it under tight permissions and
-returns structured results for the model to summarize. The model plans. It
-never gets a hand on the database itself.
+A React/TypeScript front end and a Teams integration both talk to a .NET 10
+service built on the Anthropic SDK. The service runs a custom tool-calling
+orchestration layer with two kinds of tools: read-only SQL queries against live
+business data, and Qdrant vector search over internal documents. The model
+decides what to call; the service executes it and returns structured results.
+Before anything reaches the user, a second model pass checks the draft answer
+against those tool results.
 
 ## Technical highlights
 
-- **A deliberately small tool surface.** The SQL tool never runs free-form
-  queries. It hits a fixed set of vetted views with bound parameters, so no
-  amount of clever prompting reaches data it shouldn't. For a model pointed at
-  production, that constraint *is* the feature.
-- **Cost discipline.** Careful prompt design and model selection keep the whole
-  thing running around $115/month while serving the full team, cheap enough
-  that nobody has to think about it.
-- **A migration nobody noticed.** When the Bot Framework Python SDK was
-  deprecated, I moved the Teams integration onto the M365 Agents SDK as an
-  isolated adapter swap rather than a rewrite. No downtime for users.
+- **Read-only SQL, checked before it runs.** Every query the model writes is
+  parsed into a syntax tree (AST) and validated as read-only before execution,
+  so the guardrail sits in code rather than in the prompt.
+- **Answers grounded in the data.** The second model pass compares the reply
+  to what the tools actually returned, which catches answers that drift from the
+  numbers.
+- **Docs and data in one place.** Qdrant document search sits beside the SQL
+  tool, so data questions and doc lookups go through the same chat.
 
 ## Tradeoffs
 
-The small tool surface trades flexibility for safety on purpose: a genuinely
-new question sometimes needs a new vetted view before OTIS can answer it,
-instead of working out of the box. For a tool touching production data, I'll
-take that trade every time. I'd rather add a reviewed view than hand a model a
-blank check.
+Validating SQL and verifying every answer adds work to each request: a parse
+step before a query runs and an extra model call before a reply goes out. For a
+tool pointed at live business data, I'll take a slightly slower, correct answer
+over a fast one nobody can trust.
 
 ## Outcome
 
-Ad-hoc data requests to engineering dropped about 80%. OTIS runs quietly in
-production and has become the default way non-technical staff get to their
-data. That's the only outcome I really cared about: people reach for it without
-being told to.
+Recurring software support requests dropped 20%. OTIS runs company-wide in
+production, and people reach for it instead of filing a request.
