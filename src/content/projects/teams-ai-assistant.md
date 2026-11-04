@@ -19,10 +19,10 @@ stack:
 metrics:
   - value: '20%'
     label: 'fewer recurring support requests'
+  - value: '59% → 100%'
+    label: 'eval pass rate'
   - value: 'All staff'
     label: 'company-wide rollout'
-  - value: 'Web + Teams'
-    label: 'where it runs'
 links: {}
 ---
 
@@ -58,6 +58,10 @@ against those tool results.
 - **Answers grounded in the data.** The second model pass compares the reply
   to what the tools actually returned, which catches answers that drift from the
   numbers.
+- **Measured, not guessed.** A 101-case eval harness with automated grading and
+  cost tracking drove the agent's behavior pass rate from 59% to 100% and its bad
+  steps from 92 to 1, while p90 latency fell from 104s to 42s and cost dropped
+  36%.
 - **Docs and data in one place.** Qdrant document search sits beside the SQL
   tool, so data questions and doc lookups go through the same chat.
 
