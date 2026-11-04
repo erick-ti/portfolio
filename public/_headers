@@ -1,3 +1,5 @@
-# Keep the resume out of search indexes on Cloudflare Pages.
+# Keep the resume out of search indexes, and have browsers check for a
+# newer copy on every visit so an updated resume shows up right away.
 /resume.pdf
   X-Robots-Tag: noindex
+  Cache-Control: no-cache

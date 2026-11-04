@@ -1,7 +1,7 @@
 ---
 title: 'Serial Traceability Engine'
 org: 'CelLink'
-tagline: 'A recursive traceability layer over an ERP database, plus a stored-procedure rewrite that cut a key query from 11 seconds to under 500ms.'
+tagline: 'A recursive traceability layer over an ERP database, plus a stored-procedure rewrite that cut a key query from 11 seconds to 500ms.'
 category: 'Data & Operations'
 status: 'Shipped'
 visibility: 'private-production'
@@ -56,9 +56,9 @@ production-scale data.
 - **Recursive genealogy.** A recursive CTE replaces the manual dig: one walk from
   finished serial back to raw inputs, matching how traceability actually works
   rather than how the tables happen to be laid out.
-- **11s to sub-500ms.** I killed the cursors, rewrote the logic set-based with
+- **11s to 500ms.** I killed the cursors, rewrote the logic set-based with
   CTEs and CROSS APPLY, and added composite indexes to match the access paths.
-  That cut p95 execution time from 11 seconds to under 500ms, roughly 22x.
+  That cut p95 execution time from 11 seconds to 500ms, roughly 22x.
 - **Validated at scale.** The 1.8M+ record sync meant every change was exercised
   against production-scale data before it went near a real report.
 
@@ -74,4 +74,4 @@ code that survives production beats clever code that only works on a demo row.
 
 The traceability layer answers genealogy questions that used to take manual
 assembly, and the rewritten procedure dropped a daily-use report from 11 seconds
-to under half a second. The report stopped being a complaint.
+to 500ms. The report stopped being a complaint.
