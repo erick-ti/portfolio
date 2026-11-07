@@ -30,10 +30,13 @@ jobs:
         with:
           # the same pin Cloudflare Pages reads, so CI and production agree
           node-version-file: .node-version
-          cache: npm
+          package-manager-cache: false
+
+      - name: test runtime guard
+        run: make test-runtime
 
       - name: install
-        run: npm ci
+        run: make install
 
       - name: build
-        run: npm run build
+        run: make build

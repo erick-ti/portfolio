@@ -28,3 +28,6 @@ yarn-error.log*
 # local-only planning + ops docs
 ROADMAP.md
 DEPLOY_RUNBOOK.md
+
+# Reviewed project installation policy
+!/.npmrc
